@@ -1,0 +1,69 @@
+# Recording template only. No training/evaluation runner exists yet.
+# Empty strings and arrays mean UNSET; fill them before a future experiment.
+[experiment]
+id = ""
+status = "planned"
+hypothesis = ""
+git_commit = ""
+seed = ""
+
+[model]
+family = "" # YOLO or RT-DETR, after the implementation is selected
+variant = ""
+implementation_version = ""
+weights_source = ""
+weights_sha256 = ""
+
+[dataset]
+name = "VisDrone"
+release = ""
+root = "data/visdrone"
+train_split = ""
+validation_split = ""
+test_split = ""
+manifest_sha256 = ""
+annotation_conversion_version = ""
+
+[inference]
+device = "" # Explicit CPU/GPU device; not yet selected or tested
+input_size = [] # [height, width] in pixels
+batch_size = ""
+confidence_threshold = ""
+nms_iou_threshold = ""
+
+[tiling]
+enabled = "" # Fill with a boolean once the experiment is defined
+tile_size = []
+overlap = ""
+merge_method = ""
+
+[augmentation]
+methods = []
+parameters = ""
+
+[evaluation]
+metrics = ["mAP50", "mAP50-95", "AP_small", "Precision", "Recall", "FPS", "latency"]
+tiny_small_definition = ""
+area_coordinate_space = ""
+class_mapping = ""
+ignored_annotation_policy = ""
+evaluator_version = ""
+precision_recall_operating_point = ""
+
+[timing]
+warmup_iterations = ""
+measured_iterations = ""
+scope = "" # Include/exclude preprocessing, postprocessing, I/O explicitly
+device_synchronization = ""
+
+[environment]
+python_version = ""
+dependency_snapshot = ""
+os = ""
+cpu = ""
+gpu = ""
+cuda_version = ""
+
+[execution]
+command = ""
+output_directory = "outputs/"

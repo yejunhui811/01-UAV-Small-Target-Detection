@@ -218,3 +218,50 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# UAV research: local datasets, raw media, weights and large run outputs
+data/
+datasets/
+weights/
+checkpoints/
+outputs/
+runs/
+wandb/
+mlruns/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.engine
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+
+# Raw images belong in ignored data/ or outputs/; reviewed figures are allowed
+raw/
+raw_images/
+raw_videos/
+cache/
+
+# Local secrets and private machine configuration
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
+.aws/
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*~
