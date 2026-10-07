@@ -1,6 +1,7 @@
 # Documentation
 
 - [Dataset management](dataset.md)
+- [Dataset acquisition record template](dataset-record-template.md)
 - [Dependency strategy](dependencies.md)
 - [Evaluation policy](evaluation.md)
 - [Git workflow](git-workflow.md)

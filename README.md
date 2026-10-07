@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 프로젝트 기반 구조 구축. 학습·추론·benchmark를 실행하지 않았으며 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
+**현재 단계: 기반 구조 완료 및 데이터 준비 계획 정리. 데이터 다운로드·학습·추론·benchmark를 실행하지 않았으며 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
 
 ## Project overview
 
@@ -30,11 +30,12 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 
 ## Dataset
 
-계획한 데이터셋은 **VisDrone**입니다. dataset 자체는 repository에 포함하지 않습니다. 정확한 release, split, annotation 변환 규칙과 이용 조건은 데이터 준비 단계에서 확인합니다.
+첫 데이터 준비 대상은 **VisDrone2019-DET (정지 이미지 detection)**입니다. 공식 자료를 근거로 train 학습 / val 설정 비교 / test-dev 최종 평가 계획을 [데이터 준비 문서](docs/dataset.md)에 정리했습니다. 실제 archive와 release별 이용 조건은 다운로드 단계에서 다시 확인해야 합니다. dataset 자체는 repository에 포함하지 않습니다.
 
-- 권장 로컬 위치: `data/visdrone/<release>/`
+- 권장 로컬 위치: `data/visdrone/visdrone2019-det/`
 - `data/`, `datasets/`는 `.gitignore`로 제외하며 현재 생성·다운로드하지 않습니다.
 - version, checksum, class mapping, split과 변환 이력은 [dataset 관리 정책](docs/dataset.md)에 따라 기록합니다.
+- 준비 작업은 [데이터 기록 양식](docs/dataset-record-template.md)에 남기며 현재 상태는 미다운로드·미검증입니다.
 
 ## Evaluation metrics
 
@@ -77,6 +78,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 ├── docs/
 │   ├── README.md
 │   ├── dataset.md
+│   ├── dataset-record-template.md
 │   ├── dependencies.md
 │   ├── evaluation.md
 │   └── git-workflow.md
@@ -119,7 +121,8 @@ python scripts/validate_structure.py
 ## Roadmap
 
 - [x] 기반 구조 검토 및 사용자 승인 후 main에 반영 ([PR #1](https://github.com/yejunhui811/01-UAV-Small-Target-Detection/pull/1))
-- [ ] VisDrone version/split·이용 조건 확인 및 로컬 데이터 관리
+- [x] VisDrone 공식 자료 조사 및 release/split·데이터 준비 계획 문서화
+- [ ] 실제 archive별 이용 조건 확인, 로컬 데이터 준비·검증
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증
 - [ ] 크기별 evaluation 정의 및 failure analysis
