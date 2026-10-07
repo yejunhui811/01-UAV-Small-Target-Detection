@@ -1,0 +1,3 @@
+# Bootstrap stage: no third-party runtime dependencies.
+# Python 3.11 is the initial development target; see docs/dependencies.md.
+# Add and pin packages only when implementing and validating a concrete feature.
