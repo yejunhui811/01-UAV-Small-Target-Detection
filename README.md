@@ -94,8 +94,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 ```bash
 git clone https://github.com/yejunhui811/01-UAV-Small-Target-Detection.git
 cd 01-UAV-Small-Target-Detection
-# bootstrap branch 검토 시 사용; main에 merge한 이후에는 필요 없음
-git switch setup/project-bootstrap
+git switch main
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
@@ -119,7 +118,7 @@ python scripts/validate_structure.py
 
 ## Roadmap
 
-- [ ] 기반 구조 검토 및 사용자 승인 후 main에 반영
+- [x] 기반 구조 검토 및 사용자 승인 후 main에 반영 ([PR #1](https://github.com/yejunhui811/01-UAV-Small-Target-Detection/pull/1))
 - [ ] VisDrone version/split·이용 조건 확인 및 로컬 데이터 관리
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증
@@ -131,4 +130,4 @@ python scripts/validate_structure.py
 
 ## Git/GitHub workflow
 
-별도 branch에서 작업하고 검증 → `git add` → commit → push → Pull Request 검토 순서로 진행합니다. 이번 작업은 `setup/project-bootstrap` push까지만 진행합니다. `main` merge에는 사용자의 명시적 허가가 필요합니다. 명령의 의미와 이후 흐름은 [Git 안내](docs/git-workflow.md), 프로젝트 운영 규칙은 [AGENTS.md](AGENTS.md)를 참고하세요.
+최신 `main`에서 별도 branch를 만들고 변경 → 검증 → `git add` → commit → push → Pull Request 검토 → 사용자 승인 후 merge 순서로 진행합니다. PR 생성과 push만으로는 `main`에 반영되지 않습니다. `main` merge에는 사용자의 명시적 허가가 필요합니다. merge 후에는 로컬 `main`을 동기화하고 다음 작업 branch를 만듭니다. 명령의 의미와 이후 흐름은 [Git 안내](docs/git-workflow.md), 프로젝트 운영 규칙은 [AGENTS.md](AGENTS.md)를 참고하세요.
