@@ -1,6 +1,6 @@
 # VisDrone dataset preparation plan
 
-문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **계획만 작성, 데이터 미다운로드·미검증**. 학습·변환·추론·benchmark는 실행하지 않았다.
+문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **준비 계획과 metadata 검증 도구 구성, 실제 데이터 미다운로드·미검증**. 학습·변환·추론·benchmark는 실행하지 않았다.
 
 ## Target release and scope
 
@@ -107,4 +107,4 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 7. 버전이 고정된 변환 코드와 command, seed가 필요한 과정, 실행 환경을 기록한다. raw 데이터는 보존한다.
 8. 실제 검사 결과와 적용 조건 근거를 검토하고, 관련 설정을 채운 뒤에만 baseline 구현·실행 준비 완료로 표시한다.
 
-변환 스크립트, 실제 hash, 파일 수 검사, class 통계, leakage 검사와 sample 시각화는 모두 **미실행**이다. dataset 상태는 [기록 양식](dataset-record-template.md)으로 관리하며 모델 성능은 [실험 기록](../experiments/template.md)에만 실제 output 근거로 기록한다.
+[Metadata validator](visdrone-validation.md)는 파일 대응·annotation 값과 선택적인 exact duplicate 검사 일부를 구현했으며 합성 예제로 테스트했다. 실제 VisDrone의 hash 계산, 파일 수·class 통계·leakage 검사·sample 시각화와 label 변환은 모두 **미실행**이다. 이미지 decoding 등 도구가 검사하지 않는 항목도 별도로 확인해야 한다. dataset 상태는 [기록 양식](dataset-record-template.md)으로 관리하며 모델 성능은 [실험 기록](../experiments/template.md)에만 실제 output 근거로 기록한다.

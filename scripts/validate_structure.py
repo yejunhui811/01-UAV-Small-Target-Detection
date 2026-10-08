@@ -1,4 +1,4 @@
-"""Validate the bootstrap structure without installing packages or running models."""
+"""Validate the project structure without installing packages or running models."""
 
 from pathlib import Path
 import re
@@ -17,6 +17,9 @@ REQUIRED_FILES = (
     "results/figures/README.md", "results/tables/README.md", "docs/README.md",
     "docs/dataset.md", "docs/dependencies.md", "docs/evaluation.md",
     "docs/git-workflow.md", "assets/README.md",
+    "src/uav_small_target/__init__.py", "src/uav_small_target/visdrone_validation.py",
+    "scripts/validate_visdrone.py", "tests/README.md", "tests/test_visdrone_validation.py",
+    "docs/dataset-record-template.md", "docs/visdrone-validation.md",
 )
 IGNORED_PROBES = (
     "data/visdrone/sample.jpg", "datasets/sample.png", "weights/model.pt",
