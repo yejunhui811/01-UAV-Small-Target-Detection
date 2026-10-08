@@ -59,8 +59,13 @@ def execute(config_path, cfg, run):
     model = YOLO(str(weights))
     model.add_callback("on_train_start", lambda trainer: write_progress(run,
         progress_record(0, cfg["train"]["epochs"])))
-    model.add_callback("on_fit_epoch_end", lambda trainer: write_progress(run,
-        progress_record(trainer.epoch + 1, cfg["train"]["epochs"], trainer.metrics)))
+    def record_epoch_progress(trainer):
+        # final_eval also calls this hook with an extra logging step. It is not
+        # another trained epoch, and best-checkpoint metrics are not epoch metrics.
+        if trainer.validator.training:
+            write_progress(run, progress_record(trainer.epoch + 1,
+                cfg["train"]["epochs"], trainer.metrics))
+    model.add_callback("on_fit_epoch_end", record_epoch_progress)
     model.train(**shared, name="train", epochs=train["epochs"], seed=cfg["experiment"]["seed"],
         deterministic=True, optimizer=train["optimizer"], lr0=train["lr0"], momentum=train["momentum"],
         weight_decay=train["weight_decay"], mosaic=train["mosaic"], close_mosaic=train["close_mosaic"],
