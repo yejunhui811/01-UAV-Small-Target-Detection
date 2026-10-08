@@ -1,6 +1,6 @@
 # VisDrone annotation preview
 
-이미지 한 장의 원본 annotation을 검토하는 도구이다. **모델 prediction이나 failure analysis 결과가 아니며 실제 VisDrone에서는 아직 실행하지 않았다.** 현재 확인한 이미지는 직접 생성한 합성 예제뿐이다. 기존 `Pillow==12.3.0`을 사용하며 새 dependency는 추가하지 않는다.
+이미지 한 장의 원본 annotation을 검토하는 도구이다. **모델 prediction이나 failure analysis 결과가 아니다.** 합성 테스트와 실제 train/val 각각 한 장의 GT preview를 확인했다. [준비 기록](datasets/visdrone2019-det-2026-10-08/README.md)을 따른다. 실제 이미지는 로컬에만 보관한다. 기존 `Pillow==12.3.0`을 사용하며 새 dependency는 추가하지 않는다.
 
 ## Synthetic demo
 
@@ -18,7 +18,7 @@ python scripts/preview_visdrone.py --demo \
 
 ## Future local data usage
 
-**아래는 실제 데이터 준비 후의 예시이며 이번 단계에서는 실행하지 않았다.** 전체 dataset 상태는 먼저 [validator](visdrone-validation.md)로 확인한다.
+**아래는 임의의 로컬 pair를 검토하는 사용 예시이다. 실행한 두 sample의 기록은 snapshot 안내를 따른다.** 전체 dataset 상태는 먼저 [validator](visdrone-validation.md)로 확인한다.
 
 ```bash
 python scripts/preview_visdrone.py \
@@ -63,4 +63,4 @@ python -B -m unittest discover -s tests -v
 python -B scripts/validate_structure.py
 ```
 
-[Preview tests](../tests/test_visdrone_preview.py)는 합성 PNG/JPEG/TXT로 pixel 좌표·색상, class/ignore 보존, 경계·소수·offscreen, parser 일치, partial/empty output, decoding/UTF-8, EXIF, overwrite·raw 보호, CLI와 반복 출력 일치를 확인한다. 실제 데이터·학습·추론·benchmark는 실행하지 않는다.
+[Preview tests](../tests/test_visdrone_preview.py)는 합성 PNG/JPEG/TXT로 pixel 좌표·색상, class/ignore 보존, 경계·소수·offscreen, parser 일치, partial/empty output, decoding/UTF-8, EXIF, overwrite·raw 보호, CLI와 반복 출력 일치를 확인한다. 합성 테스트에서 실제 데이터를 사용하지 않는다. 실제 pair preview 실행과 모델 실험은 구분한다.

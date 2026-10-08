@@ -1,6 +1,6 @@
 # VisDrone dataset preparation plan
 
-문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **준비 계획과 검증·시각화·YOLO 변환 도구 구성, 실제 데이터 미다운로드·미검증**. 실제 데이터 변환·학습·추론·benchmark는 실행하지 않았다. 도구는 합성 예제로만 검증했다.
+문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **실제 train/val 로컬 준비·검사·변환 v2·audit 완료(기록된 원본 예외 포함)**. 실제 수량·hash·오류와 남은 항목은 [snapshot 기록](datasets/visdrone2019-det-2026-10-08/README.md)에 있다. 학습·추론·benchmark는 아직 실행하지 않았다.
 
 ## Target release and scope
 
@@ -57,7 +57,7 @@ data/visdrone/visdrone2019-det/
     └── validation-report.json   # 실제 검사 결과와 제외/수정 내역
 ```
 
-**현재 이 구조와 파일은 생성하지 않는다.** `data/`와 `datasets/` 전체는 `.gitignore` 대상이다. 세부 metadata도 기본적으로 로컬에 보관하고, 비밀정보·raw annotation이 없는 검토된 요약만 향후 `docs/datasets/<snapshot-id>/README.md`로 공유한다.
+**사용자 승인 후 train/val archive·raw·metadata·변환 v2를 이 구조에 준비했다. test-dev는 받지 않았다.** `data/`와 `datasets/` 전체는 `.gitignore` 대상이다. 세부 metadata도 기본적으로 로컬에 보관하고, 비밀정보·raw annotation이 없는 검토된 요약만 향후 `docs/datasets/<snapshot-id>/README.md`로 공유한다.
 
 향후 실험 설정에서는 [설정 양식](../configs/experiment.example.toml)의 `dataset.release`, `root`, 각 split, manifest hash와 변환 버전을 채운다. 원본을 읽는 loader의 root는 `data/visdrone/visdrone2019-det/raw`로 계획하며, 변환본을 사용하면 해당 `derived/<conversion-version>` 경로를 명시한다. 현재 example의 빈 값은 유지한다.
 
@@ -69,7 +69,7 @@ data/visdrone/visdrone2019-det/
 bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlusion
 ```
 
-[YOLO 변환 도구 v1](visdrone-yolo.md)에 구현하고 합성 예제로 검증한 10개 target class mapping (실제 데이터 미변환):
+[YOLO 변환 도구 v1](visdrone-yolo.md)에 구현하고 합성 예제로 검증한 10개 target class mapping (실제 변환 v2 완료; 0면적 예외 3행 제외):
 
 | 원본 ID | Class | 모델 ID (v1) |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 | 9 | bus | 8 |
 | 10 | motor | 9 |
 
-원본 class 0은 ignored regions, 11은 others이다. 모델 ID는 프로젝트의 변환 정책이며 실제 VisDrone 변환은 아직 실행하지 않았다. 공식 evaluator는 ignored regions와 others 관련 검출을 제외하는 규칙을 갖는다. [공식 annotation·평가 설명](https://github.com/VisDrone/VisDrone2018-DET-toolkit/blob/005445782213e20cb91bc50a597db3dd949e749a/README.md)
+원본 class 0은 ignored regions, 11은 others이다. 모델 ID는 프로젝트의 변환 정책이며 실제 train/val 변환 v2와 전체 역변환·hash audit를 완료했다. 공식 evaluator는 ignored regions와 others 관련 검출을 제외하는 규칙을 갖는다. [공식 annotation·평가 설명](https://github.com/VisDrone/VisDrone2018-DET-toolkit/blob/005445782213e20cb91bc50a597db3dd949e749a/README.md)
 
 변환 v1 정책과 향후 평가 구현 시 검증할 규칙:
 
@@ -96,7 +96,7 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 
 ## Acquisition and validation checklist (future work)
 
-다음 항목은 실제 데이터 다운로드·변환 작업을 수행할 때 사용할 계획이다. 아직 실제 데이터로 실행하지 않았다.
+다음은 실제 준비 시 사용할 checklist이다. 이번 train/val 실행 결과와 완료·미완료 항목은 [snapshot 기록](datasets/visdrone2019-det-2026-10-08/README.md)에 구분했다.
 
 1. 적용 조건과 실제 archive 링크를 확인하고 train/val 준비 범위, 저장 공간과 외부 보관 위치를 정한다. 공식 페이지에서 연결된 배포처를 사용한다.
 2. 각 archive의 출처·파일명·받은 날짜·크기·SHA-256을 기록한다. 공식 checksum이 없으면 로컬 hash를 계산했다고 명시하고 공식 인증 값으로 표현하지 않는다.
@@ -107,6 +107,6 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 7. 버전이 고정된 변환 코드와 command, seed가 필요한 과정, 실행 환경을 기록한다. raw 데이터는 보존한다.
 8. 실제 검사 결과와 적용 조건 근거를 검토하고, 관련 설정을 채운 뒤에만 baseline 구현·실행 준비 완료로 표시한다.
 
-[VisDrone validator](visdrone-validation.md)는 파일 대응·annotation 값과 선택적인 exact duplicate·이미지 decoding·bbox 경계 검사 일부를 구현했으며 합성 예제로 테스트했다. 실제 VisDrone의 hash 계산, 파일 수·class 통계·leakage 검사·sample 시각화와 label 변환은 모두 **미실행**이다. near-duplicate/scene leakage와 release·이용 조건 등 도구가 검사하지 않는 항목도 별도로 확인해야 한다. dataset 상태는 [기록 양식](dataset-record-template.md)으로 관리하며 모델 성능은 [실험 기록](../experiments/template.md)에만 실제 output 근거로 기록한다.
+[VisDrone validator](visdrone-validation.md)는 파일 대응·annotation 값과 선택적인 exact duplicate·이미지 decoding·bbox 경계 검사 일부를 구현했으며 합성 예제로 테스트했다. 실제 train/val의 hash·파일 수·class 집계·exact duplicate 검사·sample 시각화·label 변환을 실행했다. Near-duplicate/scene leakage는 미검증이다. near-duplicate/scene leakage와 release·이용 조건 등 도구가 검사하지 않는 항목도 별도로 확인해야 한다. dataset 상태는 [기록 양식](dataset-record-template.md)으로 관리하며 모델 성능은 [실험 기록](../experiments/template.md)에만 실제 output 근거로 기록한다.
 
-[YOLO 변환 도구](visdrone-yolo.md)는 target bbox를 strict하게 검사하고 모든 원본 행을 보존하는 변환 정책을 합성 데이터로 검증했다. 실제 데이터에 대한 위 미실행 상태는 유지한다.
+[YOLO 변환 도구 v2](visdrone-yolo.md)는 target bbox의 strict 검사를 유지하며, 명시한 0면적 제외만 허용하고 원본 행·사유를 보존한다. 원본 strict 검사 error 3개는 변환본 준비 후에도 기록에 남긴다.

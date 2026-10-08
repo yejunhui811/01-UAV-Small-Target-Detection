@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "visdrone2019-det-2026-10-08",
+  "status": "prepared_with_documented_exceptions",
+  "measured_at": "2026-10-09T00:00:36.362968+09:00",
+  "source": "official VisDrone GitHub README links to Google Drive train/val",
+  "archives": [
+    {
+      "name": "VisDrone2019-DET-train.zip",
+      "size_bytes": 1549875511,
+      "sha256": "86a77eba93137bfc16e4993860de9245b0675c0dba0d3ab98fb458699e256f84",
+      "crc": "passed_all_extracted_files",
+      "files": 12942,
+      "uncompressed_bytes": 1556080035,
+      "source_url": "https://drive.google.com/file/d/1a2oHjcEcwXP8oUF95qiwrqzACb2YlUhn/view?usp=sharing"
+    },
+    {
+      "name": "VisDrone2019-DET-val.zip",
+      "size_bytes": 81638851,
+      "sha256": "abeea063037e5d20398837deb11084e652402a34ddf4f207bdf541a6f2a35ef9",
+      "crc": "passed_all_extracted_files",
+      "files": 1097,
+      "uncompressed_bytes": 82137188,
+      "source_url": "https://drive.google.com/file/d/1bxK5zgLn0_L8x276eKkuYA_FzwCIjb59/view?usp=sharing"
+    }
+  ],
+  "terms": {
+    "checked_date": "2026-10-08 Asia/Seoul",
+    "use": "local academic non-commercial UAV detection research",
+    "academic_use_guidance": "verified on current official page",
+    "release_specific_license": "unresolved: current copyright names VisDrone2021; train/val ZIPs contain no LICENSE/README",
+    "redistribution": "no raw images/annotations/derived labels shared",
+    "sources": [
+      "https://aiskyeye.com/data-protection/",
+      "https://aiskyeye.com/submit-2023/object-detection-2/"
+    ]
+  },
+  "raw_validation": {
+    "status": "failed",
+    "errors": 3,
+    "warnings": 3,
+    "issue_counts": {
+      "invalid_bbox_size": 3,
+      "within_split_duplicate": 3
+    },
+    "cross_split_exact_duplicate_pairs_found": 0,
+    "images_decoding_failed": 0,
+    "target_bbox_outside_image": 0
+  },
+  "conversion_version": "visdrone-yolo-v2",
+  "zero_area_policy": "exclude_and_record",
+  "splits": {
+    "train": {
+      "images": 6471,
+      "source_rows": 353550,
+      "target_rows": 343204,
+      "ignored_rows": 10343,
+      "other_rows": 0,
+      "excluded_zero_area_rows": 3,
+      "empty_label_images": 0,
+      "warnings": 3023
+    },
+    "val": {
+      "images": 548,
+      "source_rows": 40169,
+      "target_rows": 38759,
+      "ignored_rows": 1410,
+      "other_rows": 0,
+      "excluded_zero_area_rows": 0,
+      "empty_label_images": 0,
+      "warnings": 351
+    }
+  },
+  "audit": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "hash_inventory_and_label_roundtrip",
+    "raw_files_verified": 14039,
+    "splits": {
+      "train": {
+        "source_rows": 353550,
+        "ignored_other_rows": 10343,
+        "target_rows": 343204,
+        "images": 6471,
+        "excluded_zero_area_rows": 3
+      },
+      "val": {
+        "source_rows": 40169,
+        "target_rows": 38759,
+        "ignored_other_rows": 1410,
+        "images": 548
+      }
+    },
+    "yolo_class_counts": {
+      "train": {
+        "3": 144866,
+        "1": 27059,
+        "4": 24956,
+        "5": 12875,
+        "9": 29647,
+        "2": 10480,
+        "6": 4812,
+        "7": 3246,
+        "0": 79337,
+        "8": 5926
+      },
+      "val": {
+        "3": 14064,
+        "9": 4886,
+        "1": 5125,
+        "0": 8844,
+        "7": 532,
+        "6": 1045,
+        "2": 1287,
+        "5": 750,
+        "4": 1975,
+        "8": 251
+      }
+    },
+    "coordinate_tolerance_pixels": {
+      "absolute": 1e-09,
+      "relative": 1e-12
+    },
+    "not_checked": [
+      "trainer_loading",
+      "official_evaluator",
+      "near_duplicates",
+      "model_metrics"
+    ]
+  },
+  "report_sha256": {
+    "file_manifest": "c3c0f320db81aac2523012335cfaf3d548c3ed69b0b9c7887ddc357bea5238c3",
+    "extraction": "72af6a125924d4e5dcf5da958639a06e654267faa0da4a7df37cb311e9e38760",
+    "raw_validation": "d4934a0cacdfebd29de651c6d36b763b583249bd24f40887daf098528c50048b",
+    "conversion_manifest": "39f81c8e209721823f365b377e82b8526e8ef75c2299b40be92f5b599945cf64",
+    "audit": "ec8fdbb47150174e293136c9a821ee79653d4bd1ea01eed7eae4fb734bdc23d4"
+  },
+  "executed_source_sha256": {
+    "scripts/extract_visdrone.py": "7aaa4cd07ad0e61dcd42c73f98baa2648d5bfaef44986cba79790d1a93cda8d4",
+    "scripts/audit_visdrone_preparation.py": "f9ede3bbabf994d209d2ba69de1e26fb373c9592eee495e5ff47358d5c4bdf3a",
+    "scripts/validate_visdrone.py": "70c3dba16c22ef95a4307b7ac24ee100e7fc8ca3b746485a84c21caf36c8919d",
+    "scripts/convert_visdrone_yolo.py": "19baa2fa9b4d77db010ace00e79b1e239cd5d8d8f45ee936f5d0644cbbeef216",
+    "src/uav_small_target/visdrone_validation.py": "d45ba6c967e91f01444642106f3463256d957ea34956480bb0bca82cd78955fe",
+    "src/uav_small_target/visdrone_annotations.py": "779714689a4e9b5a4795ea99cf14a0344873dcbdc139c9ec00f6960bd943357b",
+    "src/uav_small_target/visdrone_yolo.py": "4f0d78b6b718d162d99ee28daeb2f242b21d61aebeaf703c25b157598370c0ff"
+  },
+  "code_base_commit": "df0441848b8101d2cb96ccbf81e3bc3c47eeb298",
+  "environment": {
+    "python": "3.11.9",
+    "pillow": "12.3.0",
+    "system": "Darwin",
+    "release": "23.6.0",
+    "machine": "arm64"
+  },
+  "readiness": {
+    "local_dataset_preparation": "complete_with_documented_exceptions",
+    "baseline_implementation": "ready",
+    "training": "not_run",
+    "evaluation": "not_run",
+    "release_specific_license": "unresolved",
+    "raw_image_publication": "not_authorized"
+  },
+  "not_checked": [
+    "near_duplicate_or_scene_leakage",
+    "official_evaluator_equivalence",
+    "trainer_loading_and_ignore_loss",
+    "model_metrics",
+    "official_archive_hash_authenticity"
+  ]
+}

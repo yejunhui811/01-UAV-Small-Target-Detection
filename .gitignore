@@ -222,6 +222,12 @@ __marimo__/
 # UAV research: local datasets, raw media, weights and large run outputs
 data/
 datasets/
+# Allow only reviewed snapshot documentation; raw files stay ignored.
+!docs/datasets/
+docs/datasets/**
+!docs/datasets/*/
+!docs/datasets/*/README.md
+!docs/datasets/*/summary.json
 weights/
 checkpoints/
 outputs/
@@ -261,6 +267,7 @@ credentials/
 
 # OS and temporary files
 .uav-convert-*/
+.uav-extract-*/
 .DS_Store
 Thumbs.db
 *.tmp

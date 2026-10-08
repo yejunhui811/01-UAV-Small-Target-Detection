@@ -34,8 +34,11 @@ class Annotation:
         return "other" if self.category == 11 else "target"
 
 
-def parse_annotation_row(text: str) -> Annotation:
-    """Parse one nonblank GT row; collect the same core errors as the validator."""
+def parse_annotation_row(text: str, *, allow_zero_area: bool = False) -> Annotation:
+    """Parse GT metadata; zero-area rows are opt-in for audited exclusion only.
+
+    Validator/preview keep strict defaults. Negative extents always fail.
+    """
     fields = [field.strip() for field in text.strip().split(",")]
     if len(fields) == 9 and fields[-1] == "":
         fields.pop()
@@ -55,7 +58,8 @@ def parse_annotation_row(text: str) -> Annotation:
         errors.append(("invalid_score", "GT score must be 0 or 1"))
     if category not in range(12):
         errors.append(("invalid_category", "Category must be in 0..11"))
-    if values[2] <= 0 or values[3] <= 0:
+    if (values[2] < 0 or values[3] < 0
+            or (not allow_zero_area and (values[2] == 0 or values[3] == 0))):
         errors.append(("invalid_bbox_size", "BBox width and height must be positive"))
     if errors:
         raise AnnotationRowError(errors)

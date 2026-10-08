@@ -1,5 +1,9 @@
 # Tests
 
+`test_visdrone_extraction.py`는 합성 ZIP으로 경로 이탈·symlink·case collision 거부, CRC extraction과 파일 hash 기록, 원본 보존, 기존 output 보호, 뒤늦은 archive 오류 시 output 미공개를 확인한다. CI에서는 실제 ZIP을 다운로드하지 않는다.
+
+`test_visdrone_preparation_audit.py`는 합성 ZIP → extraction → 변환 → audit 전체 흐름과 원본·복사 이미지·label 변경, 예상 외 파일 검출을 확인한다. `test_visdrone_yolo.py`는 v2의 명시적인 0면적 제외·원본 행 보존도 검사하며 기본 strict 검사는 유지한다.
+
 저장소 root에서 Pillow를 설치한 가상환경으로 전체 테스트를 실행:
 
 ```bash

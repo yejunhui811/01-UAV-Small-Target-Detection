@@ -15,7 +15,7 @@ from .visdrone_annotations import AnnotationRowError, CATEGORY_NAMES, parse_anno
 from .visdrone_validation import IMAGE_SUFFIXES, SPLIT_DIRECTORIES
 
 
-CONVERSION_VERSION = "visdrone-yolo-v1"
+CONVERSION_VERSION = "visdrone-yolo-v2"
 OUTPUT_SPLITS = {"train": "train", "val": "val", "test-dev": "test"}
 
 
@@ -43,7 +43,7 @@ def _inventory(directory, suffixes):
 
 
 def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
-                    synthetic=False) -> dict:
+                    synthetic=False, zero_area_policy="reject") -> dict:
     """Copy images, emit target labels and preserve every valid GT row in JSONL.
 
     Requires train+val; test-dev is optional and mapped to test. Every pair must
@@ -57,6 +57,8 @@ def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
         raise ValueError("Output directory already exists; choose a new directory")
     root, output_dir = Path(root).resolve(), output_dir.resolve()
     splits = tuple(splits)
+    if zero_area_policy not in ("reject", "exclude"):
+        raise ValueError("zero_area_policy must be reject or exclude")
     if not root.is_dir():
         raise ValueError("Choose an existing raw dataset root")
     if (len(splits) != len(set(splits)) or not {"train", "val"}.issubset(splits)
@@ -114,14 +116,18 @@ def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
                         if not raw.strip():
                             continue
                         try:
-                            row = parse_annotation_row(raw)
+                            row = parse_annotation_row(raw, allow_zero_area=zero_area_policy == "exclude")
                         except AnnotationRowError as exc:
                             raise ValueError(f"{context}:{line}: {exc}") from exc
                         counts["source_rows"] += 1
                         if row.truncation not in (0, 1) or row.occlusion not in (0, 1, 2):
                             issues.append({"line": line, "code": "unusual_attributes"})
-                        converted = None
-                        if row.kind == "target":
+                        converted, exclusion_reason = None, None
+                        if row.width == 0 or row.height == 0:
+                            counts["excluded_zero_area_rows"] += 1
+                            exclusion_reason = "zero_area_bbox"
+                            issues.append({"line": line, "code": "excluded_zero_area_bbox"})
+                        elif row.kind == "target":
                             right, bottom = row.x + row.width, row.y + row.height
                             if row.x < 0 or row.y < 0 or right > width or bottom > height:
                                 raise ValueError(f"{context}:{line}: target bbox outside raw image; no clipping")
@@ -137,8 +143,10 @@ def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
                             counts["target_rows"] += 1
                         else:
                             counts[f"{row.kind}_rows"] += 1
+                            exclusion_reason = row.kind
                         rows.append({"line": line, **asdict(row), "kind": row.kind,
-                                     "category_name": CATEGORY_NAMES[row.category], "yolo": converted})
+                                     "category_name": CATEGORY_NAMES[row.category], "yolo": converted,
+                                     "exclusion_reason": exclusion_reason})
                     if not labels:
                         counts["empty_label_images"] += 1
                         issues.append({"code": "empty_target_labels_review_before_training"})
@@ -162,7 +170,7 @@ def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
                     counts["warnings"] += len(issues)
                 split_counts[split] = {key: counts[key] for key in (
                     "images", "source_rows", "target_rows", "ignored_rows", "other_rows",
-                    "empty_label_images", "warnings")}
+                    "excluded_zero_area_rows", "empty_label_images", "warnings")}
                 totals.update(counts)
 
         # JSON double-quoted scalars are valid YAML; no YAML package needed to emit.
@@ -185,6 +193,7 @@ def convert_dataset(root: Path, output_dir: Path, splits=("train", "val"), *,
                 "exif": "require_identity_orientation",
                 "precision": "17_significant_digits_positive_normalized_extents",
                 "invalid_row_or_target_bbox": "abort_without_publishing_output",
+                "zero_area": "exclude_and_record" if zero_area_policy == "exclude" else "reject",
             },
             "splits": split_counts,
             "not_checked": ["release_identity_and_terms", "exact_duplicates_and_scene_leakage", "trainer_loading",

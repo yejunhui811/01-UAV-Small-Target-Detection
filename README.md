@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 데이터 준비 계획, 검증·annotation 시각화·YOLO label 변환 도구 및 CI 구성. 도구는 합성 예제로 테스트했으며 실제 데이터 다운로드·검증·변환·학습·추론·benchmark는 실행하지 않았습니다. 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
+**현재 단계: 실제 VisDrone train/val 다운로드·검사·YOLO 변환 및 전체 hash·좌표 audit 완료. 원본의 0면적 annotation 3행은 기록 후 변환본에서 제외했습니다. 학습·추론·benchmark는 아직 실행하지 않았으며 성능 결과는 없습니다.** [실제 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md)을 참고하세요. 아래 모델과 실험은 계획입니다.
 
 ## Project overview
 
@@ -35,10 +35,10 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 - 권장 로컬 위치: `data/visdrone/visdrone2019-det/`
 - `data/`, `datasets/`는 `.gitignore`로 제외하며 현재 생성·다운로드하지 않습니다.
 - version, checksum, class mapping, split과 변환 이력은 [dataset 관리 정책](docs/dataset.md)에 따라 기록합니다.
-- 준비 작업은 [데이터 기록 양식](docs/dataset-record-template.md)에 남기며 현재 상태는 미다운로드·미검증입니다.
+- [실제 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md)에 공식 archive hash와 train 6,471장·val 548장, 원본 오류·변환 제외·audit 결과를 남겼습니다. 데이터는 로컬에만 있습니다.
 - 파일 대응과 annotation 검사는 [VisDrone validator](docs/visdrone-validation.md)를 사용할 수 있습니다. `--check-images`로 이미지 decoding·bbox 경계 검사도 선택할 수 있으며 전체 데이터 검증을 대신하지 않습니다.
 - [Annotation preview](docs/visdrone-preview.md)는 bbox·원본 class·ignored/other·경계 경고를 시각화합니다. 데이터 없이 실행하는 합성 데모도 제공합니다.
-- [YOLO label 변환](docs/visdrone-yolo.md)은 10개 class 정규화 label과 모든 원본 행의 provenance를 저장합니다. 합성 데모로만 검증했으며, ignore 영역의 학습 loss·공식 평가 처리는 향후 검증할 항목입니다.
+- [YOLO label 변환](docs/visdrone-yolo.md)은 10개 class 정규화 label과 모든 원본 행의 provenance를 저장합니다. 실제 train/val 변환 v2도 완료했으며, ignore 영역의 학습 loss·공식 평가 처리는 향후 검증할 항목입니다.
 
 ## Evaluation metrics
 
@@ -80,13 +80,17 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── validate_structure.py
 │   ├── validate_visdrone.py
 │   ├── preview_visdrone.py
-│   └── convert_visdrone_yolo.py
+│   ├── convert_visdrone_yolo.py
+│   ├── extract_visdrone.py
+│   └── audit_visdrone_preparation.py
 ├── tests/
 │   ├── README.md
 │   ├── test_visdrone_validation.py
 │   ├── test_visdrone_images.py
 │   ├── test_visdrone_preview.py
-│   └── test_visdrone_yolo.py
+│   ├── test_visdrone_yolo.py
+│   ├── test_visdrone_extraction.py
+│   └── test_visdrone_preparation_audit.py
 ├── notebooks/README.md
 ├── experiments/
 │   ├── README.md
@@ -102,6 +106,10 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── visdrone-validation.md
 │   ├── visdrone-preview.md
 │   ├── visdrone-yolo.md
+│   ├── visdrone-extraction.md
+│   ├── datasets/visdrone2019-det-2026-10-08/
+│   │   ├── README.md
+│   │   └── summary.json
 │   ├── dependencies.md
 │   ├── evaluation.md
 │   ├── git-workflow.md
@@ -162,7 +170,9 @@ python scripts/convert_visdrone_yolo.py --help
 - [x] GitHub Actions 합성 테스트·구조 검증 workflow 구성
 - [x] 합성 예제로 검증한 annotation 시각화·원본 좌표 기록 도구 구현
 - [x] 합성 예제로 검증한 VisDrone → YOLO label 변환·원본 행 보존 도구 구현
-- [ ] 실제 archive별 이용 조건 확인, 로컬 데이터 준비·검증
+- [x] 공식 train/val 다운로드·CRC/hash·이미지/annotation 검사·sample 검토
+- [x] 0면적 예외를 기록한 변환 v2 및 전체 이미지/label·좌표 audit
+- [ ] 2019 release별 license 적용 확정 (현재 학술 이용 안내 확인; 데이터 비공개 유지)
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증
 - [ ] 크기별 evaluation 정의 및 failure analysis

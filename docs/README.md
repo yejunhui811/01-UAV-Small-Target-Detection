@@ -2,6 +2,8 @@
 
 - [Dataset management](dataset.md)
 - [Dataset acquisition record template](dataset-record-template.md)
+- [Local VisDrone archive extraction](visdrone-extraction.md)
+- [Actual train/val preparation snapshot](datasets/visdrone2019-det-2026-10-08/README.md)
 - [VisDrone metadata and image validator](visdrone-validation.md)
 - [VisDrone annotation preview](visdrone-preview.md)
 - [VisDrone → YOLO label conversion](visdrone-yolo.md)
