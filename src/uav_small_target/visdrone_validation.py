@@ -2,9 +2,10 @@
 
 from collections import Counter
 import hashlib
-import math
 from pathlib import Path
 import warnings
+
+from .visdrone_annotations import AnnotationRowError, parse_annotation_row
 
 
 SPLIT_DIRECTORIES = {
@@ -144,38 +145,15 @@ def validate_dataset(
                             continue
                         nonblank = True
                         counts["nonblank_rows"] += 1
-                        fields = [field.strip() for field in text.strip().split(",")]
-                        # Accept one optional terminal delimiter, not extra columns.
-                        if len(fields) == 9 and fields[-1] == "":
-                            fields.pop()
-                        if len(fields) != 8:
-                            issue("error", "field_count", split, path, "Expected 8 fields", line_number)
-                            continue
                         try:
-                            values = [float(field) for field in fields]
-                        except ValueError:
-                            issue("error", "non_numeric", split, path, "All fields must be numeric", line_number)
+                            row = parse_annotation_row(text)
+                        except AnnotationRowError as exc:
+                            for code, message in exc.issues:
+                                issue("error", code, split, path, message, line_number)
                             continue
-                        if not all(math.isfinite(value) for value in values):
-                            issue("error", "non_finite", split, path, "NaN/Infinity are not allowed", line_number)
-                            continue
-                        x, y, width, height, score, category, truncation, occlusion = values
-                        if not all(value.is_integer() for value in values[4:]):
-                            issue("error", "non_integer_metadata", split, path, "Metadata fields must be integers", line_number)
-                            continue
-                        score, category, truncation, occlusion = map(int, values[4:])
-                        invalid = False
-                        if score not in (0, 1):
-                            issue("error", "invalid_score", split, path, "GT score must be 0 or 1", line_number)
-                            invalid = True
-                        if category not in range(12):
-                            issue("error", "invalid_category", split, path, "Category must be in 0..11", line_number)
-                            invalid = True
-                        if width <= 0 or height <= 0:
-                            issue("error", "invalid_bbox_size", split, path, "BBox width and height must be positive", line_number)
-                            invalid = True
-                        if invalid:
-                            continue
+                        x, y, width, height = row.x, row.y, row.width, row.height
+                        score, category = row.score, row.category
+                        truncation, occlusion = row.truncation, row.occlusion
                         counts["valid_core_rows"] += 1
                         categories[str(category)] += 1
                         if score == 0 or category in (0, 11):

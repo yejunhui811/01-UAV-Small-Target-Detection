@@ -15,3 +15,5 @@ python -B -m unittest discover -s tests -v
 Pillow 없이 기존 metadata 테스트만 확인할 때는 `python3 -B -m unittest discover -s tests -p test_visdrone_validation.py -v`를 사용한다. 전체 테스트는 Pillow가 필요하다. GPU/모델 실행, 실제 VisDrone dataset와 공식 evaluator는 테스트하지 않는다. 각 검증 범위는 [validator 안내](../docs/visdrone-validation.md)를 따른다.
 
 [GitHub Actions CI](../docs/ci.md)는 Ubuntu 24.04 / Python 3.11에서 전체 합성 테스트, site packages 없는 metadata 테스트와 구조 검증을 실행한다. 실제 성공 여부는 해당 commit의 PR Checks 또는 Actions 로그를 확인한다.
+
+`test_visdrone_preview.py`는 시각화의 실제 pixel 좌표·색상과 원본 SHA-256, class/ignore 의미, 경계·소수·offscreen, validator/parser 오류 일치, partial·empty preview, 손상/UTF-8, EXIF 원본 크기, raw/symlink·overwrite 보호, CLI·dependency와 반복 출력 일치를 합성 pair로 확인한다. 실제 VisDrone 그림은 생성하지 않는다.
