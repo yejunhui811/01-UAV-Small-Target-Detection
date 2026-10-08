@@ -4,6 +4,7 @@
 - [Dataset acquisition record template](dataset-record-template.md)
 - [VisDrone metadata and image validator](visdrone-validation.md)
 - [VisDrone annotation preview](visdrone-preview.md)
+- [VisDrone → YOLO label conversion](visdrone-yolo.md)
 - [Dependency strategy](dependencies.md)
 - [Evaluation policy](evaluation.md)
 - [Git workflow](git-workflow.md)

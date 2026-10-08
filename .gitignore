@@ -260,6 +260,7 @@ credentials/
 .aws/
 
 # OS and temporary files
+.uav-convert-*/
 .DS_Store
 Thumbs.db
 *.tmp

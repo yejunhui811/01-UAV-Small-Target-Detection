@@ -17,3 +17,5 @@ Pillow 없이 기존 metadata 테스트만 확인할 때는 `python3 -B -m unitt
 [GitHub Actions CI](../docs/ci.md)는 Ubuntu 24.04 / Python 3.11에서 전체 합성 테스트, site packages 없는 metadata 테스트와 구조 검증을 실행한다. 실제 성공 여부는 해당 commit의 PR Checks 또는 Actions 로그를 확인한다.
 
 `test_visdrone_preview.py`는 시각화의 실제 pixel 좌표·색상과 원본 SHA-256, class/ignore 의미, 경계·소수·offscreen, validator/parser 오류 일치, partial·empty preview, 손상/UTF-8, EXIF 원본 크기, raw/symlink·overwrite 보호, CLI·dependency와 반복 출력 일치를 합성 pair로 확인한다. 실제 VisDrone 그림은 생성하지 않는다.
+
+`test_visdrone_yolo.py`는 합성 train/val/test-dev pair로 정규화 좌표 round-trip, 10개 class mapping·ignored/other 보존, 정밀도·빈 label, 원본/input/output hash·반복성, 잘못된 입력 뒤 output 미공개, decoding/EXIF·split·case collision·symlink·동시 output 생성 보호와 CLI를 확인한다. trainer와 공식 evaluator는 실행하지 않는다.

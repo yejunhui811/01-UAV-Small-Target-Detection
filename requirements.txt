@@ -1,3 +1,3 @@
-# Python 3.11; image validation only. No model/training dependencies.
+# Python 3.11; image validation, preview and label conversion only. No model/training dependencies.
 # Pinned version validated with synthetic fixtures; see docs/dependencies.md.
 Pillow==12.3.0
