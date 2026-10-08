@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 데이터 준비 계획 및 metadata 검증 도구 구성. 도구는 합성 예제로 테스트했으며 실제 데이터 다운로드·검증·학습·추론·benchmark는 실행하지 않았습니다. 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
+**현재 단계: 데이터 준비 계획 및 metadata·이미지 검증 도구 구성. 도구는 합성 예제로 테스트했으며 실제 데이터 다운로드·검증·학습·추론·benchmark는 실행하지 않았습니다. 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
 
 ## Project overview
 
@@ -36,7 +36,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 - `data/`, `datasets/`는 `.gitignore`로 제외하며 현재 생성·다운로드하지 않습니다.
 - version, checksum, class mapping, split과 변환 이력은 [dataset 관리 정책](docs/dataset.md)에 따라 기록합니다.
 - 준비 작업은 [데이터 기록 양식](docs/dataset-record-template.md)에 남기며 현재 상태는 미다운로드·미검증입니다.
-- 파일 대응과 annotation 검사는 [metadata validator](docs/visdrone-validation.md)를 사용할 수 있습니다. 이미지 전체 decoding 등 미검증 항목은 별도로 확인해야 합니다.
+- 파일 대응과 annotation 검사는 [VisDrone validator](docs/visdrone-validation.md)를 사용할 수 있습니다. `--check-images`로 이미지 decoding·bbox 경계 검사도 선택할 수 있으며 전체 데이터 검증을 대신하지 않습니다.
 
 ## Evaluation metrics
 
@@ -60,7 +60,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 ├── AGENTS.md                 # Codex 운영 및 연구·Git 규칙
 ├── README.md
 ├── .gitignore
-├── requirements.txt          # 현재 주석만 포함
+├── requirements.txt          # Pillow 고정 버전; 모델 패키지 없음
 ├── configs/
 │   ├── README.md
 │   └── experiment.example.toml
@@ -75,7 +75,8 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   └── validate_visdrone.py
 ├── tests/
 │   ├── README.md
-│   └── test_visdrone_validation.py
+│   ├── test_visdrone_validation.py
+│   └── test_visdrone_images.py
 ├── notebooks/README.md
 ├── experiments/
 │   ├── README.md
@@ -113,13 +114,13 @@ python -m pip install -r requirements.txt
 python scripts/validate_structure.py
 ```
 
-`requirements.txt`는 현재 주석만 있어 모델 패키지를 설치하지 않습니다. 가상환경 없이도 Python 3.11에서 `python3 scripts/validate_structure.py`로 구조를 검증할 수 있습니다. 이 단계에 실행할 학습·추론 명령은 없습니다.
+`requirements.txt`는 이미지 검증에 사용하는 `Pillow==12.3.0`만 설치합니다. 구조 검증과 기본 metadata 검사는 외부 패키지 없이 실행할 수 있습니다. 이 단계에 실행할 학습·추론 명령은 없습니다.
 
 데이터 없이 검증 도구를 확인하려면 아래 명령을 사용합니다. 테스트는 임시 합성 예제를 생성·제거합니다.
 
 ```bash
-python3 -B -m unittest discover -s tests -v
-python3 scripts/validate_visdrone.py --help
+python -B -m unittest discover -s tests -v
+python scripts/validate_visdrone.py --help
 ```
 
 ## Reproducibility policy
@@ -140,6 +141,7 @@ python3 scripts/validate_visdrone.py --help
 - [x] 기반 구조 검토 및 사용자 승인 후 main에 반영 ([PR #1](https://github.com/yejunhui811/01-UAV-Small-Target-Detection/pull/1))
 - [x] VisDrone 공식 자료 조사 및 release/split·데이터 준비 계획 문서화
 - [x] 합성 예제로 테스트한 annotation·파일 대응 검증 도구 구현
+- [x] 합성 PNG/JPEG 기반 이미지 decoding·bbox 경계 검사 추가
 - [ ] 실제 archive별 이용 조건 확인, 로컬 데이터 준비·검증
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증

@@ -1,4 +1,4 @@
-"""CLI for read-only VisDrone DET pairing and annotation checks."""
+"""CLI for read-only VisDrone DET pairing, annotation and optional image checks."""
 
 import argparse
 import json
@@ -15,12 +15,16 @@ def main(argv=None) -> int:
     parser.add_argument("--root", type=Path, required=True, help="Directory containing VisDrone2019-DET-{train,val,test-dev}")
     parser.add_argument("--splits", nargs="+", choices=tuple(SPLIT_DIRECTORIES), default=["train", "val"])
     parser.add_argument("--check-duplicates", action="store_true", help="Hash image bytes and flag exact duplicates; adds disk I/O")
+    parser.add_argument("--check-images", action="store_true", help="Decode single-frame JPEG/PNG and review bbox boundaries; requires Pillow")
     parser.add_argument("--report", type=Path, help="Also save JSON outside the dataset; existing files are never overwritten")
     args = parser.parse_args(argv)
     try:
         if args.report and args.report.resolve().is_relative_to(args.root.resolve()):
             raise ValueError("Report must be outside the dataset root to preserve raw files")
-        report = validate_dataset(args.root, tuple(args.splits), check_duplicates=args.check_duplicates)
+        report = validate_dataset(
+            args.root, tuple(args.splits), check_duplicates=args.check_duplicates,
+            check_images=args.check_images,
+        )
         text = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
