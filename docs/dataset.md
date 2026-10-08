@@ -1,6 +1,6 @@
 # VisDrone dataset preparation plan
 
-문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **준비 계획과 metadata·이미지 검증 도구 구성, 실제 데이터 미다운로드·미검증**. 학습·변환·추론·benchmark는 실행하지 않았다.
+문서 확인일: **2026-10-08 (Asia/Seoul)**. 상태: **준비 계획과 검증·시각화·YOLO 변환 도구 구성, 실제 데이터 미다운로드·미검증**. 실제 데이터 변환·학습·추론·benchmark는 실행하지 않았다. 도구는 합성 예제로만 검증했다.
 
 ## Target release and scope
 
@@ -69,9 +69,9 @@ data/visdrone/visdrone2019-det/
 bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlusion
 ```
 
-향후 변환에서 사용할 10개 target class mapping 계획:
+[YOLO 변환 도구 v1](visdrone-yolo.md)에 구현하고 합성 예제로 검증한 10개 target class mapping (실제 데이터 미변환):
 
-| 원본 ID | Class | 계획한 모델 ID |
+| 원본 ID | Class | 모델 ID (v1) |
 | --- | --- | --- |
 | 1 | pedestrian | 0 |
 | 2 | people | 1 |
@@ -84,9 +84,9 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 | 9 | bus | 8 |
 | 10 | motor | 9 |
 
-원본 class 0은 ignored regions, 11은 others이다. 모델 ID는 프로젝트의 계획이며 아직 변환하지 않았다. 공식 evaluator는 ignored regions와 others 관련 검출을 제외하는 규칙을 갖는다. [공식 annotation·평가 설명](https://github.com/VisDrone/VisDrone2018-DET-toolkit/blob/005445782213e20cb91bc50a597db3dd949e749a/README.md)
+원본 class 0은 ignored regions, 11은 others이다. 모델 ID는 프로젝트의 변환 정책이며 실제 VisDrone 변환은 아직 실행하지 않았다. 공식 evaluator는 ignored regions와 others 관련 검출을 제외하는 규칙을 갖는다. [공식 annotation·평가 설명](https://github.com/VisDrone/VisDrone2018-DET-toolkit/blob/005445782213e20cb91bc50a597db3dd949e749a/README.md)
 
-변환·평가 구현 시 확정할 규칙:
+변환 v1 정책과 향후 평가 구현 시 검증할 규칙:
 
 - 원본 score/ignore 영역/others와 truncation/occlusion을 보존한다. score 0 및 class 0/11을 일반 target class로 변환하지 않는다.
 - label에서 ignore 항목만 삭제한 평가를 공식 VisDrone 평가와 동일하다고 주장하지 않는다. ignore 판정과 bbox 좌표 경계 convention은 toolkit code와 실제 sample로 검증한다.
@@ -96,7 +96,7 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 
 ## Acquisition and validation checklist (future work)
 
-다음 항목은 다운로드·변환 작업을 수행할 때 사용할 계획이다. 이번 문서 작업에서는 실행하지 않았다.
+다음 항목은 실제 데이터 다운로드·변환 작업을 수행할 때 사용할 계획이다. 아직 실제 데이터로 실행하지 않았다.
 
 1. 적용 조건과 실제 archive 링크를 확인하고 train/val 준비 범위, 저장 공간과 외부 보관 위치를 정한다. 공식 페이지에서 연결된 배포처를 사용한다.
 2. 각 archive의 출처·파일명·받은 날짜·크기·SHA-256을 기록한다. 공식 checksum이 없으면 로컬 hash를 계산했다고 명시하고 공식 인증 값으로 표현하지 않는다.
@@ -108,3 +108,5 @@ bbox_left,bbox_top,bbox_width,bbox_height,score,object_category,truncation,occlu
 8. 실제 검사 결과와 적용 조건 근거를 검토하고, 관련 설정을 채운 뒤에만 baseline 구현·실행 준비 완료로 표시한다.
 
 [VisDrone validator](visdrone-validation.md)는 파일 대응·annotation 값과 선택적인 exact duplicate·이미지 decoding·bbox 경계 검사 일부를 구현했으며 합성 예제로 테스트했다. 실제 VisDrone의 hash 계산, 파일 수·class 통계·leakage 검사·sample 시각화와 label 변환은 모두 **미실행**이다. near-duplicate/scene leakage와 release·이용 조건 등 도구가 검사하지 않는 항목도 별도로 확인해야 한다. dataset 상태는 [기록 양식](dataset-record-template.md)으로 관리하며 모델 성능은 [실험 기록](../experiments/template.md)에만 실제 output 근거로 기록한다.
+
+[YOLO 변환 도구](visdrone-yolo.md)는 target bbox를 strict하게 검사하고 모든 원본 행을 보존하는 변환 정책을 합성 데이터로 검증했다. 실제 데이터에 대한 위 미실행 상태는 유지한다.

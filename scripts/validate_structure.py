@@ -23,6 +23,8 @@ REQUIRED_FILES = (
     ".github/workflows/ci.yml", "docs/ci.md",
     "src/uav_small_target/visdrone_annotations.py", "src/uav_small_target/visdrone_preview.py",
     "scripts/preview_visdrone.py", "tests/test_visdrone_preview.py", "docs/visdrone-preview.md",
+    "src/uav_small_target/visdrone_yolo.py", "scripts/convert_visdrone_yolo.py",
+    "tests/test_visdrone_yolo.py", "docs/visdrone-yolo.md",
     "docs/dataset-record-template.md", "docs/visdrone-validation.md",
 )
 IGNORED_PROBES = (
@@ -33,7 +35,7 @@ IGNORED_PROBES = (
     "secrets/api-key.txt", "credentials/token.json", "private.pem",
     ".aws/credentials", "cache/item", ".cache/item", ".venv/bin/python",
     "src/__pycache__/module.pyc", "notebooks/.ipynb_checkpoints/test.ipynb",
-    ".DS_Store", "temporary.tmp",
+    ".DS_Store", "temporary.tmp", ".uav-convert-interrupted/annotations.jsonl",
 )
 TRACKABLE_PROBES = REQUIRED_FILES + (
     "results/figures/reviewed.png", "results/tables/measured.csv",

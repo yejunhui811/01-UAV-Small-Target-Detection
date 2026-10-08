@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 데이터 준비 계획, 검증·annotation 시각화 도구 및 CI 구성. 도구는 합성 예제로 테스트했으며 실제 데이터 다운로드·검증·학습·추론·benchmark는 실행하지 않았습니다. 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
+**현재 단계: 데이터 준비 계획, 검증·annotation 시각화·YOLO label 변환 도구 및 CI 구성. 도구는 합성 예제로 테스트했으며 실제 데이터 다운로드·검증·변환·학습·추론·benchmark는 실행하지 않았습니다. 측정 결과는 없습니다.** 아래 모델과 실험은 계획입니다.
 
 ## Project overview
 
@@ -38,6 +38,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 - 준비 작업은 [데이터 기록 양식](docs/dataset-record-template.md)에 남기며 현재 상태는 미다운로드·미검증입니다.
 - 파일 대응과 annotation 검사는 [VisDrone validator](docs/visdrone-validation.md)를 사용할 수 있습니다. `--check-images`로 이미지 decoding·bbox 경계 검사도 선택할 수 있으며 전체 데이터 검증을 대신하지 않습니다.
 - [Annotation preview](docs/visdrone-preview.md)는 bbox·원본 class·ignored/other·경계 경고를 시각화합니다. 데이터 없이 실행하는 합성 데모도 제공합니다.
+- [YOLO label 변환](docs/visdrone-yolo.md)은 10개 class 정규화 label과 모든 원본 행의 provenance를 저장합니다. 합성 데모로만 검증했으며, ignore 영역의 학습 loss·공식 평가 처리는 향후 검증할 항목입니다.
 
 ## Evaluation metrics
 
@@ -72,17 +73,20 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │       ├── __init__.py
 │       ├── visdrone_annotations.py
 │       ├── visdrone_validation.py
-│       └── visdrone_preview.py
+│       ├── visdrone_preview.py
+│       └── visdrone_yolo.py
 ├── scripts/
 │   ├── README.md
 │   ├── validate_structure.py
 │   ├── validate_visdrone.py
-│   └── preview_visdrone.py
+│   ├── preview_visdrone.py
+│   └── convert_visdrone_yolo.py
 ├── tests/
 │   ├── README.md
 │   ├── test_visdrone_validation.py
 │   ├── test_visdrone_images.py
-│   └── test_visdrone_preview.py
+│   ├── test_visdrone_preview.py
+│   └── test_visdrone_yolo.py
 ├── notebooks/README.md
 ├── experiments/
 │   ├── README.md
@@ -97,6 +101,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── dataset-record-template.md
 │   ├── visdrone-validation.md
 │   ├── visdrone-preview.md
+│   ├── visdrone-yolo.md
 │   ├── dependencies.md
 │   ├── evaluation.md
 │   ├── git-workflow.md
@@ -122,7 +127,7 @@ python -m pip install -r requirements.txt
 python scripts/validate_structure.py
 ```
 
-`requirements.txt`는 이미지 검증에 사용하는 `Pillow==12.3.0`만 설치합니다. 구조 검증과 기본 metadata 검사는 외부 패키지 없이 실행할 수 있습니다. 이 단계에 실행할 학습·추론 명령은 없습니다.
+`requirements.txt`는 이미지 검증·시각화·label 변환에 사용하는 `Pillow==12.3.0`만 설치합니다. 구조 검증과 기본 metadata 검사는 외부 패키지 없이 실행할 수 있습니다. 이 단계에 실행할 학습·추론 명령은 없습니다.
 
 데이터 없이 검증 도구를 확인하려면 아래 명령을 사용합니다. 테스트는 임시 합성 예제를 생성·제거합니다.
 
@@ -130,6 +135,7 @@ python scripts/validate_structure.py
 python -B -m unittest discover -s tests -v
 python scripts/validate_visdrone.py --help
 python scripts/preview_visdrone.py --help
+python scripts/convert_visdrone_yolo.py --help
 ```
 
 합성 annotation 그림을 확인하는 방법과 새 output 경로 사용 규칙은 [preview 안내](docs/visdrone-preview.md)를 따릅니다. 결과는 로컬 `outputs/`에 저장되며 연구 성능 결과가 아닙니다.
@@ -155,6 +161,7 @@ python scripts/preview_visdrone.py --help
 - [x] 합성 PNG/JPEG 기반 이미지 decoding·bbox 경계 검사 추가
 - [x] GitHub Actions 합성 테스트·구조 검증 workflow 구성
 - [x] 합성 예제로 검증한 annotation 시각화·원본 좌표 기록 도구 구현
+- [x] 합성 예제로 검증한 VisDrone → YOLO label 변환·원본 행 보존 도구 구현
 - [ ] 실제 archive별 이용 조건 확인, 로컬 데이터 준비·검증
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증

@@ -4,7 +4,7 @@
 
 `requirements.txt`는 **Pillow==12.3.0**만 포함한다. JPEG/PNG decoding과 크기 검사가 필요한 `--check-images` 기능에 사용하며, Python 3.11.9 / macOS arm64 가상환경에서 설치·import·합성 테스트와 `pip check`를 검증했다. 고정 버전은 [PyPI 배포 정보](https://pypi.org/project/pillow/12.3.0/)에서 확인하고 실제 설치한 버전이다. [CI](ci.md)는 Ubuntu 24.04 / Python 3.11을 대상으로 구성하며 실제 실행 결과와 버전은 각 commit의 Actions 로그로 확인한다. 그 외 OS/Python 조합은 아직 검증하지 않았다.
 
-Pillow는 `Image.open()` 후 `verify()`, 재열기 후 `load()`로 컨테이너와 실제 픽셀 decoding을 검사한다. [공식 Image API](https://pillow.readthedocs.io/en/stable/reference/Image.html)를 따른다. 같은 dependency의 ImageDraw/ImageFont로 [annotation preview](visdrone-preview.md)도 생성한다. 기본 metadata 검사와 구조 검증은 표준 라이브러리만 사용하며 Pillow는 이미지 검사·preview 요청 시에만 import한다. 해당 요청 시 미설치 상태면 CLI exit code 2와 설치 안내를 반환한다.
+Pillow는 `Image.open()` 후 `verify()`, 재열기 후 `load()`로 컨테이너와 실제 픽셀 decoding을 검사한다. [공식 Image API](https://pillow.readthedocs.io/en/stable/reference/Image.html)를 따른다. 같은 dependency의 ImageDraw/ImageFont로 [annotation preview](visdrone-preview.md)도 생성한다. 기본 metadata 검사와 구조 검증은 표준 라이브러리만 사용하며 Pillow는 이미지 검사·preview·label 변환 요청 시에만 import한다. 해당 요청 시 미설치 상태면 CLI exit code 2와 설치 안내를 반환한다.
 
 전체 합성 테스트를 실행하는 로컬 환경:
 
@@ -17,6 +17,8 @@ python -B -m unittest discover -s tests -v
 ```
 
 PyTorch, Ultralytics, RT-DETR 관련 패키지는 baseline 구현 시 실제 사용할 구현체와 CPU/GPU 환경을 정하고 호환성을 검증한 뒤 추가한다. 불필요한 패키지를 미리 설치하지 않는다.
+
+[YOLO label 변환](visdrone-yolo.md)도 기존 Pillow로 원본 크기·decoding을 확인한다. 출력 YAML은 고정 key와 JSON-quoted scalar로 작성하며 YAML/모델 dependency를 추가하지 않는다. 실제 trainer loading은 미검증이다.
 
 향후 dependency 도입 시:
 1. 기능에 필요한 직접 dependency와 검증한 버전을 `requirements.txt`에 기록한다.
