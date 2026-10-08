@@ -31,6 +31,14 @@ REQUIRED_FILES = (
     "docs/datasets/visdrone2019-det-2026-10-08/README.md",
     "docs/datasets/visdrone2019-det-2026-10-08/summary.json",
     "docs/dataset-record-template.md", "docs/visdrone-validation.md",
+    "requirements-yolo.txt", "requirements-metrics.txt", "configs/yolo-smoke.toml", "configs/yolo-pilot.toml",
+    "configs/yolo-baseline.toml", "scripts/run_yolo_experiment.py",
+    "src/uav_small_target/yolo_experiment.py", "tests/test_yolo_experiment.py", "docs/yolo-baseline.md",
+    "scripts/summarize_yolo_run.py", "experiments/exp-001-yolo11n-smoke/README.md",
+    "experiments/exp-002-yolo11n-pilot-mps/README.md",
+    "experiments/exp-002-yolo11n-pilot-mps/summary.json",
+    "results/tables/exp-002-yolo11n-pilot-mps.csv",
+    "results/figures/exp-002-yolo11n-pilot-mps-ap.png",
 )
 IGNORED_PROBES = (
     "data/visdrone/sample.jpg", "datasets/sample.png", "weights/model.pt",
@@ -43,6 +51,7 @@ IGNORED_PROBES = (
     ".DS_Store", "temporary.tmp", ".uav-convert-interrupted/annotations.jsonl",
     ".uav-extract-interrupted/raw/sample.jpg",
     "docs/datasets/sample/raw.jpg", "docs/datasets/sample/annotations.txt",
+    ".venv-yolo/bin/python", "outputs/experiment/framework/settings.json",
 )
 TRACKABLE_PROBES = REQUIRED_FILES + (
     "results/figures/reviewed.png", "results/tables/measured.csv",
@@ -89,6 +98,15 @@ def main() -> int:
                 errors.append("Example configuration must remain planned")
         except tomllib.TOMLDecodeError as exc:
             errors.append(f"Invalid TOML: {exc}")
+
+    # Parse real experiment configurations without importing model packages.
+    sys.path.insert(0, str(ROOT / "src"))
+    from uav_small_target.yolo_experiment import load_config
+    for name in ("smoke", "pilot", "baseline"):
+        try:
+            load_config(ROOT / f"configs/yolo-{name}.toml")
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            errors.append(f"Invalid YOLO configuration {name}: {exc}")
 
     for expected, probes in ((True, IGNORED_PROBES), (False, TRACKABLE_PROBES)):
         for probe in probes:

@@ -1,5 +1,7 @@
 # Tests
 
+`test_yolo_experiment.py`는 실행 설정·오타·pilot subset 금지·경로 이탈·seed 선택, 원본 면적 GT 및 제외 행, one-to-one class matching, confidence cutoff와 IoU를 확인한다. metric dependency가 있으면 추가로 NumPy scalar JSON 기록 및 NaN 거부, 실제 pycocotools의 perfect/empty prediction·custom maxDet·GT 없는 면적 구간을 검증한다. CI는 작은 CPU-only `requirements-metrics.txt`를 설치하여 이 검사까지 실행하고 PyTorch/모델/실제 데이터를 사용하지 않는다. Pillow만 설치한 로컬 환경은 optional metric 테스트 2개를 skip하며 표시한다. 전체 모델 환경 검증은 `.venv-yolo/bin/python -B -m unittest discover -s tests -v`를 사용한다. 합성 unit test는 모델 학습을 실행하지 않는다.
+
 `test_visdrone_extraction.py`는 합성 ZIP으로 경로 이탈·symlink·case collision 거부, CRC extraction과 파일 hash 기록, 원본 보존, 기존 output 보호, 뒤늦은 archive 오류 시 output 미공개를 확인한다. CI에서는 실제 ZIP을 다운로드하지 않는다.
 
 `test_visdrone_preparation_audit.py`는 합성 ZIP → extraction → 변환 → audit 전체 흐름과 원본·복사 이미지·label 변경, 예상 외 파일 검출을 확인한다. `test_visdrone_yolo.py`는 v2의 명시적인 0면적 제외·원본 행 보존도 검사하며 기본 strict 검사는 유지한다.

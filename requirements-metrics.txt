@@ -1,0 +1,3 @@
+# CPU-only metric helpers; no model framework, weights or dataset download.
+numpy==2.4.6
+pycocotools==2.0.11

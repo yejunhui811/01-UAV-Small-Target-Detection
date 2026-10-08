@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "experiment": {
+    "id": "exp-002-yolo11n-pilot-mps",
+    "kind": "pilot",
+    "hypothesis": "One epoch on full train/val establishes a provisional 640-pixel baseline and checks small-object misses; it does not establish convergence.",
+    "seed": 42
+  },
+  "status": "completed",
+  "started_at": "2026-10-08T15:23:48.653265+00:00",
+  "finished_at": "2026-10-08T15:51:53.735731+00:00",
+  "code_base_commit": "1d5e2c33202156b12b2ec607b085b0154639ea69",
+  "executed_from_dirty_tree": true,
+  "executed_source_sha256": {
+    "scripts/run_yolo_experiment.py": "9d40f1aaccf624050c5002068c00b6c9e3675cd82b000d13c13c550b1f589faf",
+    "src/uav_small_target/yolo_experiment.py": "35da47d4ab3c0e52accfa815bcb968d8ee6b990944899c1de45e102e1e2f2706"
+  },
+  "configuration": {
+    "experiment": {
+      "id": "exp-002-yolo11n-pilot-mps",
+      "kind": "pilot",
+      "hypothesis": "One epoch on full train/val establishes a provisional 640-pixel baseline and checks small-object misses; it does not establish convergence.",
+      "seed": 42
+    },
+    "dataset": {
+      "root": "data/visdrone/visdrone2019-det/derived/visdrone-yolo-v2",
+      "manifest_sha256": "39f81c8e209721823f365b377e82b8526e8ef75c2299b40be92f5b599945cf64",
+      "train_images": 0,
+      "val_images": 0
+    },
+    "model": {
+      "weights": "weights/yolo11n.pt",
+      "weights_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+    },
+    "train": {
+      "device": "mps",
+      "epochs": 1,
+      "imgsz": 640,
+      "batch": 8,
+      "workers": 0,
+      "optimizer": "SGD",
+      "lr0": 0.01,
+      "momentum": 0.937,
+      "weight_decay": 0.0005,
+      "mosaic": 1.0,
+      "close_mosaic": 0
+    },
+    "evaluation": {
+      "conf": 0.001,
+      "nms_iou": 0.7,
+      "max_det": 500,
+      "timing_images": 20,
+      "warmup": 3
+    }
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "macOS-14.7.8-arm64-arm-64bit",
+    "machine": "arm64",
+    "device": "mps",
+    "cuda_available": false,
+    "mps_available": true,
+    "cpu_threads": 4
+  },
+  "package_versions": {
+    "ultralytics": "8.4.174",
+    "torch": "2.14.1",
+    "torchvision": "0.29.1",
+    "pycocotools": "2.0.11",
+    "numpy": "2.4.6",
+    "Pillow": "12.3.0"
+  },
+  "metrics": {
+    "kind": "pilot",
+    "trained_epochs": 1,
+    "selected_images": {
+      "train": 6471,
+      "val": 548
+    },
+    "coco": {
+      "mAP50-95": 0.04583375331824099,
+      "mAP50": 0.08551704077674466,
+      "AP_small": 0.01415914541561992,
+      "AP_medium": 0.07539435330332994,
+      "AP_large": 0.1514278604874831,
+      "definition": {
+        "evaluator": "pycocotools.COCOeval bbox",
+        "area_coordinates": "original image pixels",
+        "small_area_range_px2": [
+          0,
+          1024
+        ],
+        "iou_thresholds": [
+          0.5,
+          0.95,
+          0.05
+        ],
+        "recall_thresholds": "101 points",
+        "max_detections": 500,
+        "ignored_regions": "excluded labels; no ignore suppression; not official VisDrone"
+      }
+    },
+    "fixed_operating_point": {
+      "confidence": 0.25,
+      "matching_iou": 0.5,
+      "matching": "score-ordered same-class greedy one-to-one",
+      "tp": 8293,
+      "fp": 7006,
+      "fn": 30466,
+      "precision": 0.5420615726518073,
+      "recall": 0.2139632085451121,
+      "small_targets": 26588,
+      "missed_small": 23992,
+      "not_checked": [
+        "human cause attribution",
+        "occlusion/density stratification",
+        "official ignore rules"
+      ]
+    },
+    "timing": {
+      "images": 20,
+      "warmup": 3,
+      "batch": 1,
+      "latency_mean_ms": 27.569502021651715,
+      "latency_p50_ms": 12.562000076286495,
+      "latency_p95_ms": 36.52166704414432,
+      "FPS": 36.27196455034443,
+      "scope": "cached decoded BGR array -> preprocessing + inference + NMS + result construction; excludes disk/decode",
+      "device_synchronization": "torch.mps/cuda synchronize before and after; CPU synchronous",
+      "confidence": 0.25,
+      "nms_iou": 0.7,
+      "max_det": 500,
+      "precision": "FP32",
+      "sample": "first selected val images in lexical order",
+      "seconds": [
+        0.015474332962185144,
+        0.01078404183499515,
+        0.016309708124026656,
+        0.012896125204861164,
+        0.01101112482137978,
+        0.015876583056524396,
+        0.3044834171887487,
+        0.022418417036533356,
+        0.013116749934852123,
+        0.011060083052143455,
+        0.012923665810376406,
+        0.012446583015844226,
+        0.013155583059415221,
+        0.010883500101044774,
+        0.012052666861563921,
+        0.011765792034566402,
+        0.010589166078716516,
+        0.010725999949499965,
+        0.012677417136728764,
+        0.010739083169028163
+      ]
+    },
+    "best_weights_sha256": "cf8dc3e7d8fa694659884447a21d481e8835bf44b4b2381831619913130ded7f",
+    "not_checked": [
+      "official VisDrone evaluation",
+      "convergence",
+      "human failure attribution",
+      "other devices"
+    ]
+  },
+  "failure_analysis": {
+    "confidence": 0.25,
+    "matching_iou": 0.5,
+    "matching": "score-ordered same-class greedy one-to-one",
+    "tp": 8293,
+    "fp": 7006,
+    "fn": 30466,
+    "precision": 0.5420615726518073,
+    "recall": 0.2139632085451121,
+    "small_targets": 26588,
+    "missed_small": 23992,
+    "worst_cases": [
+      {
+        "image_id": 375,
+        "file_name": "0000295_02400_d_0000033.jpg",
+        "targets": 317,
+        "tp": 41,
+        "fp": 63,
+        "fn": 276,
+        "missed_small": 257
+      },
+      {
+        "image_id": 373,
+        "file_name": "0000295_02000_d_0000031.jpg",
+        "targets": 311,
+        "tp": 43,
+        "fp": 31,
+        "fn": 268,
+        "missed_small": 244
+      },
+      {
+        "image_id": 372,
+        "file_name": "0000295_01800_d_0000030.jpg",
+        "targets": 306,
+        "tp": 37,
+        "fp": 26,
+        "fn": 269,
+        "missed_small": 253
+      },
+      {
+        "image_id": 354,
+        "file_name": "0000291_03201_d_0000884.jpg",
+        "targets": 229,
+        "tp": 25,
+        "fp": 44,
+        "fn": 204,
+        "missed_small": 161
+      },
+      {
+        "image_id": 368,
+        "file_name": "0000295_01000_d_0000026.jpg",
+        "targets": 251,
+        "tp": 27,
+        "fp": 17,
+        "fn": 224,
+        "missed_small": 212
+      },
+      {
+        "image_id": 347,
+        "file_name": "0000291_01201_d_0000874.jpg",
+        "targets": 212,
+        "tp": 17,
+        "fp": 30,
+        "fn": 195,
+        "missed_small": 131
+      },
+      {
+        "image_id": 357,
+        "file_name": "0000291_03801_d_0000887.jpg",
+        "targets": 191,
+        "tp": 9,
+        "fp": 39,
+        "fn": 182,
+        "missed_small": 125
+      },
+      {
+        "image_id": 362,
+        "file_name": "0000291_05201_d_0000893.jpg",
+        "targets": 207,
+        "tp": 36,
+        "fp": 47,
+        "fn": 171,
+        "missed_small": 127
+      },
+      {
+        "image_id": 52,
+        "file_name": "0000086_01954_d_0000005.jpg",
+        "targets": 173,
+        "tp": 20,
+        "fp": 57,
+        "fn": 153,
+        "missed_small": 147
+      },
+      {
+        "image_id": 374,
+        "file_name": "0000295_02200_d_0000032.jpg",
+        "targets": 193,
+        "tp": 39,
+        "fp": 48,
+        "fn": 154,
+        "missed_small": 124
+      }
+    ],
+    "not_checked": [
+      "human cause attribution",
+      "occlusion/density stratification",
+      "official ignore rules"
+    ]
+  },
+  "local_artifact_sha256": {
+    "metrics.json": "826f6412851fc7b77b618e252dff64407b31ab0d4f82d6acd2bcba55a85f31e0",
+    "provenance.json": "8514ba34dc656cd38f92b67835aeae8e9f46dbbbc00b4cfa6490a568ee6a9d3e",
+    "config.toml": "069fca0d61ab0d3f763e05673ccd8208725801c38762ab5a698b67de5908d000",
+    "environment.json": "253a1f8b582c63e10caaf52d8c5467dd4e3bc1c08d6b646bb92d303186ac0fd7",
+    "predictions.json": "1ce2e552d129eda91175d3633688b9d1639e1465955dbb3ca6399d564f02aee6",
+    "failure-analysis.json": "ac2fbe874f9abac0243ac33af717f49b49f1b685db64d7c69f09571dd0062358",
+    "ultralytics-validation.json": "ac9bda6ae9fb8757050646d6ec0bdfd65c4b402c51508778a212d5d73e59a0c7",
+    "split-selection.json": "9b380a39e30a063d9de3ab70aeeab27d7a397de2d8a0f40464f22dc777d5afe9",
+    "loader-audit.json": "f5f69da63e66cca7200d338f2170cefdf659b10eb535046141baba5ae755d393"
+  },
+  "executed_sources_match_current_files": true,
+  "reviewed_loader_audit": {
+    "train": {
+      "images": 6471,
+      "targets_after_framework_deduplication": 343200,
+      "cache_sha256": "267319c61a3c57b88b444ed9ba27087eb9775d7870c204d88ecb03581f6a897a",
+      "warning_count": 4
+    },
+    "val": {
+      "images": 548,
+      "targets_after_framework_deduplication": 38759,
+      "cache_sha256": "131b9a939614604aedfe2e2bc4ec98521ec111010fb6f183909b13657bd72625",
+      "warning_count": 0
+    }
+  }
+}

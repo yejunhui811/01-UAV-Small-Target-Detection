@@ -1,6 +1,6 @@
 # Results
 
-현재 실험 결과는 없다. 이 디렉터리에는 실제 실행 후 검토한 작은 연구 산출물만 둔다.
+이 디렉터리에는 실제 실행 후 검토한 작은 연구 산출물만 둔다. 첫 [YOLO11n 1-epoch pilot](../experiments/exp-002-yolo11n-pilot-mps/README.md)의 측정 CSV와 원본 면적별 AP plot을 기록했다. 본학습 완료·공식 VisDrone 점수로 해석하지 않는다.
 
 - [figures/](figures/): 설명 가능한 비교 그림, plot, 공유 가능한 시각화
 - [tables/](tables/): 실제 측정 결과를 정리한 표
