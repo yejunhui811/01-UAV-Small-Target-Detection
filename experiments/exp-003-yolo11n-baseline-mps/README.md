@@ -28,6 +28,14 @@ YOLO11n을 전체 VisDrone train/val로 50 epochs fine-tuning하여 입력 해�
 
 Mac에서는 job 수명 동안 `caffeinate -i -s`로 idle sleep을 방지합니다. 실행 종료 시 자동 해제되며 영구적인 OS 설정 변경은 없습니다. 장시간 학습 중에는 전원을 연결하고 덮개를 열어 둡니다. 재부팅·강제 종료·덮개 닫기로 중단되면 자동 재시작하지 않으며 checkpoint와 실패 로그를 보존합니다. 현재 runner의 checkpoint resume은 미구현이므로 중단 시 재개 경로를 검토한 뒤 진행합니다.
 
+## Pre-launch validation
+
+- 합성 regression 79개 및 no-site metadata 테스트 17개 통과. 설정 dry-run, dependency check, 구조·로컬 링크·ignore·staged diff 검증 통과
+- 별도 `validation-yolo-durable-mps-v2` job에서 실제 MPS 32/8장, 2 epochs 학습 → 최종 validation → prediction/COCO/P-R/timing까지 completed, exit code 0 확인. 실행 source commit은 `6106983cb48ab246c894ab9e17439d77f52675d8`; 이후 완료 상태 설명과 이 검증 기록만 보완
+- 최초 probe는 framework의 최종 best-checkpoint validation callback을 추가 학습 epoch로 잘못 세어 진행 기록에서 실패. checkpoint·실패 로그를 보존했고, 최종 평가 callback을 구분하도록 수정한 뒤 v2에서 재검증
+- 임시 폴더에서 실제 pilot 결과 export를 실행해 기존 experiment README 보존과 중복 summary/CSV/figure export 거부 확인. 설치된 source의 effective warm-up도 1 epoch = 0, 50 epochs = 3으로 확인
+- probe는 실행 검증용 subset이며 연구 baseline 성능으로 사용하지 않음. 50-epoch 완료·수렴·최종 성능과 CUDA 학습은 아직 검증하지 않음
+
 ## Metrics, failure cases and conclusion
 
 **not measured** — 50-epoch 결과·AP_small·P/R·FPS·latency와 수렴/failure 분석은 최종 output을 실제 확인한 뒤 기록합니다. pilot 수치를 본학습 결과로 복사하지 않습니다. 실제 GT/prediction overlay·weights·dataset은 공개하지 않습니다.

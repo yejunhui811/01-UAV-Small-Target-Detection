@@ -182,7 +182,8 @@ def main(argv=None):
     provenance.update(status="completed", finished_at=now())
     write_json(run / "provenance.json", provenance)
     write_progress(run, {**progress_record(cfg["train"]["epochs"], cfg["train"]["epochs"]),
-                         "status": "completed", "phase": "completed"})
+                         "status": "completed", "phase": "completed",
+                         "metric_protocol": "Final evaluation completed; measurements are in metrics.json"})
     print(f"Completed: {run}")
     return 0
 
