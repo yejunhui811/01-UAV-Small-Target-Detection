@@ -1,0 +1,7 @@
+# Optional YOLO training environment; keep lightweight data tooling separate.
+-r requirements.txt
+-r requirements-metrics.txt
+ultralytics==8.4.174
+torch==2.14.1
+torchvision==0.29.1
+PyYAML==6.0.3

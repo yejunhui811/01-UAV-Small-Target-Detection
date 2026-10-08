@@ -1,6 +1,6 @@
 # VisDrone2019-DET local preparation: 2026-10-08
 
-**Status: prepared with documented exceptions.** 사용자가 실제 데이터 다운로드·준비를 허용한 뒤 공식 Google Drive train/val을 받아 검사하고 YOLO 변환을 완료했다. test-dev/test-challenge는 받지 않았다. 학습·추론·benchmark는 아직 실행하지 않았으며 모델 성능 수치는 없다. 아래는 실제 데이터 처리 수량이다. 기계 판독 근거와 실행 source fingerprint는 [summary.json](summary.json)에 있다.
+**Status: prepared with documented exceptions.** 사용자가 실제 데이터 다운로드·준비를 허용한 뒤 공식 Google Drive train/val을 받아 검사하고 YOLO 변환을 완료했다. test-dev/test-challenge는 받지 않았다. 이 snapshot의 기록 시점(2026-10-09 00:00 Asia/Seoul)에는 학습·추론·benchmark를 실행하지 않았으며 아래는 실제 데이터 처리 수량이다. 이후 [YOLO pilot](../../../experiments/exp-002-yolo11n-pilot-mps/README.md)을 별도 기록했다. 기계 판독 근거와 실행 source fingerprint는 [summary.json](summary.json)에 있다.
 
 다운로드는 2026-10-08에 완료했고, 준비 기록 마감일은 2026-10-09 (Asia/Seoul)이다. Snapshot ID는 다운로드 날짜를 유지한다.
 

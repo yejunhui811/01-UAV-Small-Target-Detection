@@ -1,6 +1,6 @@
 # Experiment records
 
-현재 실제 실험은 없으며 [template.md](template.md)는 미실행 양식이다.
+[template.md](template.md)는 미실행 양식이다. 실제 실행은 [로컬 smoke 검증](exp-001-yolo11n-smoke/README.md), [전체 split YOLO11n 1-epoch pilot](exp-002-yolo11n-pilot-mps/README.md)에 기록했다. pilot과 수렴한 본학습 결과를 구분한다.
 
 실험별 기록은 `experiments/<experiment-id>/README.md`, 설정은 `configs/<experiment-id>.toml`에 둔다. ID 예: `exp-001-yolo-baseline` (이름 예시이며 실행된 실험이 아니다).
 

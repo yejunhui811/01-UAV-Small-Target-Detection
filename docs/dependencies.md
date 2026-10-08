@@ -16,9 +16,9 @@ python -m pip check
 python -B -m unittest discover -s tests -v
 ```
 
-PyTorch, Ultralytics, RT-DETR 관련 패키지는 baseline 구현 시 실제 사용할 구현체와 CPU/GPU 환경을 정하고 호환성을 검증한 뒤 추가한다. 불필요한 패키지를 미리 설치하지 않는다.
+YOLO baseline은 별도 `requirements-yolo.txt`와 `.venv-yolo/`를 사용합니다. Ultralytics 8.4.174 / PyTorch 2.14.1 / torchvision 0.29.1 / PyYAML 6.0.3을 고정합니다. `requirements-metrics.txt`는 NumPy 2.4.6 / pycocotools 2.0.11만 고정하며 YOLO 환경과 CPU CI에서 공유합니다. 설치 환경·전체 transitive package version은 각 run의 ignored `environment.json`에 기록합니다. [모델 실행 안내](yolo-baseline.md)를 따르세요. CI는 Pillow 및 metric helper만 설치하고 모델 학습을 하지 않습니다. RT-DETR dependency는 아직 도입하지 않았습니다.
 
-[YOLO label 변환](visdrone-yolo.md)도 기존 Pillow로 원본 크기·decoding을 확인한다. 출력 YAML은 고정 key와 JSON-quoted scalar로 작성하며 YAML/모델 dependency를 추가하지 않는다. 실제 trainer loading은 미검증이다.
+[YOLO label 변환](visdrone-yolo.md)도 기존 Pillow로 원본 크기·decoding을 확인한다. 출력 YAML은 고정 key와 JSON-quoted scalar로 작성하며 기본 데이터 도구에는 YAML/모델 dependency를 추가하지 않는다. YOLO 실행 환경에서 실제 trainer loading을 검증하며 해당 실험 기록에 결과를 남깁니다.
 
 향후 dependency 도입 시:
 1. 기능에 필요한 직접 dependency와 검증한 버전을 `requirements.txt`에 기록한다.

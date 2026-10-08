@@ -2,7 +2,7 @@
 
 저장소 root에서 `python3 scripts/validate_structure.py`를 실행하면 기반 구조, 로컬 문서 링크, TOML parsing, ignore 규칙과 staged 파일을 확인한다. 외부 패키지 설치, 네트워크 접근, 데이터 다운로드, 학습을 수행하지 않는다.
 
-향후 학습·평가 CLI를 추가한다. 각 CLI는 실행 명령, 설정 파일, 결과 위치를 문서화해야 한다.
+`python scripts/run_yolo_experiment.py --help`는 YOLO11n 학습 → validation → 원본 면적 COCO AP_small → 고정 operating point P/R·failure 집계 → 동기화 timing을 한 run에 기록한다. `requirements-yolo.txt`를 설치하고 [baseline 안내](../docs/yolo-baseline.md)의 설정·실행 명령을 따른다. `--dry-run`은 표준 라이브러리로 설정만 검증하며 실제 실행은 기존 run을 덮어쓰지 않는다.
 
 `python scripts/extract_visdrone.py --help`로 이미 다운로드한 train/val ZIP의 안전한 extraction과 CRC·파일 hash 기록을 실행할 수 있다. 기존 output을 덮어쓰지 않는다. [준비 안내](../docs/visdrone-extraction.md)를 따른다.
 

@@ -1,6 +1,6 @@
-# Evaluation policy (planned)
+# Evaluation policy
 
-아직 evaluator 구현과 benchmark는 없다. 아래는 향후 비교 실험 전에 확정해야 할 측정 규칙이다.
+YOLO 첫 실행의 구체적인 evaluator·area·P/R·timing 규칙은 [baseline 안내](yolo-baseline.md)에 있다. 공식 VisDrone 평가와 구분한 converted target-only COCO AP를 사용한다. 아래는 후속 비교에서도 유지하거나 명시적으로 변경해야 할 공통 정책이다.
 
 | Metric | Planned definition / required record |
 | --- | --- |

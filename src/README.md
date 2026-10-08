@@ -2,7 +2,7 @@
 
 `uav_small_target/`는 프로젝트의 Python package이다. `visdrone_validation.py`에 읽기 전용 파일 대응·annotation metadata와 선택적인 이미지 decoding·bbox 경계 검사 API가 있으며, CLI는 `scripts/validate_visdrone.py`를 사용한다. 자세한 범위와 한계는 [validator 안내](../docs/visdrone-validation.md)에 있다.
 
-향후 dataset loading, model adapters, inference, evaluation 코드를 이곳에 추가한다. 현재 학습·추론 구현은 없다.
+`yolo_experiment.py`는 모델 dependency를 import하지 않는 설정 검사·hash·subset 선택·GT 변환·고정 confidence matching을 제공한다. 선택적인 `coco_metrics()`만 pycocotools/numpy를 import한다. 실제 학습·validation·timing은 `scripts/run_yolo_experiment.py`에서 Ultralytics를 필요할 때 import한다. [YOLO baseline 안내](../docs/yolo-baseline.md)를 따른다.
 
 `visdrone_yolo.py`는 공통 parser를 사용해 로컬 train/val과 선택적인 test-dev를 YOLO 형식으로 변환한다. 원본 이미지 bytes와 annotation provenance를 보존하며 입력 오류가 있으면 중단한다. [변환 정책](../docs/visdrone-yolo.md)을 따른다.
 

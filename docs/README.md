@@ -9,6 +9,7 @@
 - [VisDrone → YOLO label conversion](visdrone-yolo.md)
 - [Dependency strategy](dependencies.md)
 - [Evaluation policy](evaluation.md)
+- [YOLO11n training and evaluation](yolo-baseline.md)
 - [Git workflow](git-workflow.md)
 - [GitHub Actions CI](ci.md)
 - [Experiment records](../experiments/README.md)

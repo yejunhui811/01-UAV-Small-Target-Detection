@@ -6,7 +6,7 @@
 
 1. 코드 checkout 및 Python 3.11 준비
 2. Python/pip 버전과 실제 검사한 checkout commit 출력
-3. `requirements.txt` 설치 및 `pip check`
+3. `requirements.txt` 및 CPU-only `requirements-metrics.txt` 설치 후 `pip check` (PyTorch/YOLO 미설치)
 4. 전체 합성 `unittest` 실행
 5. `python -S`로 site packages를 제외한 기존 metadata 테스트 실행
 6. 구조·로컬 문서 링크 경로·TOML·ignore·tracked 파일 검증
@@ -34,7 +34,7 @@ Python `3.11`은 patch 버전 범위이며 Ubuntu runner 이미지도 갱신될 
 
 ```bash
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt -r requirements-metrics.txt
 python -m pip check
 python -B -m unittest discover -s tests -v
 python -S -B -m unittest discover -s tests -p test_visdrone_validation.py -v

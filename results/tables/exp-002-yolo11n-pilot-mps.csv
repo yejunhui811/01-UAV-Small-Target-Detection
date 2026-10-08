@@ -1,0 +1,2 @@
+experiment_id,kind,epochs,train_images,val_images,imgsz,mAP50_fraction,mAP50_95_fraction,AP_small_fraction,precision_conf025_iou050,recall_conf025_iou050,FPS_cached_array,latency_mean_ms,latency_p95_ms
+exp-002-yolo11n-pilot-mps,pilot,1,6471,548,640,0.08551704077674466,0.04583375331824099,0.01415914541561992,0.5420615726518073,0.2139632085451121,36.27196455034443,27.569502021651715,36.52166704414432

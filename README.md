@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 실제 VisDrone train/val 다운로드·검사·YOLO 변환 및 전체 hash·좌표 audit 완료. 원본의 0면적 annotation 3행은 기록 후 변환본에서 제외했습니다. 학습·추론·benchmark는 아직 실행하지 않았으며 성능 결과는 없습니다.** [실제 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md)을 참고하세요. 아래 모델과 실험은 계획입니다.
+**현재 단계: 실제 VisDrone 준비와 YOLO11n runner·MPS smoke·전체 train/val 1-epoch pilot을 완료했습니다. 50-epoch 본학습과 RT-DETR은 아직 실행하지 않았습니다.** [데이터 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md), [YOLO 실행 안내](docs/yolo-baseline.md), [실제 pilot 결과·failure 분석](experiments/exp-002-yolo11n-pilot-mps/README.md)을 참고하세요. pilot은 수렴한 baseline이나 공식 VisDrone 점수가 아닙니다.
 
 ## Project overview
 
@@ -23,17 +23,17 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 
 | Model family | Planned role | Status |
 | --- | --- | --- |
-| YOLO | 최초 baseline 및 해상도·tiling·augmentation 비교 | 미구현 |
+| YOLO11n | 최초 baseline 및 해상도·tiling·augmentation 비교 | 전체 split 1-epoch pilot 완료; 본학습 예정 |
 | RT-DETR | 다른 검출 구조의 baseline 비교 | 미구현 |
 
-세부 model variant, 구현체, pretrained weights 및 버전은 도입 시 선정·기록합니다. 현재 확정한 framework dependency는 없습니다.
+YOLO는 Ultralytics 8.4.174 / PyTorch 2.14.1과 공식 COCO-pretrained YOLO11n을 사용하며 버전·hash를 고정합니다. RT-DETR의 variant·구현체·weights는 도입 시 기록합니다.
 
 ## Dataset
 
 첫 데이터 준비 대상은 **VisDrone2019-DET (정지 이미지 detection)**입니다. 공식 자료를 근거로 train 학습 / val 설정 비교 / test-dev 최종 평가 계획을 [데이터 준비 문서](docs/dataset.md)에 정리했습니다. 실제 archive와 release별 이용 조건은 다운로드 단계에서 다시 확인해야 합니다. dataset 자체는 repository에 포함하지 않습니다.
 
 - 권장 로컬 위치: `data/visdrone/visdrone2019-det/`
-- `data/`, `datasets/`는 `.gitignore`로 제외하며 현재 생성·다운로드하지 않습니다.
+- `data/`, `datasets/`는 `.gitignore`로 제외합니다. 실제 train/val 데이터는 로컬 `data/`에 준비했습니다.
 - version, checksum, class mapping, split과 변환 이력은 [dataset 관리 정책](docs/dataset.md)에 따라 기록합니다.
 - [실제 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md)에 공식 archive hash와 train 6,471장·val 548장, 원본 오류·변환 제외·audit 결과를 남겼습니다. 데이터는 로컬에만 있습니다.
 - 파일 대응과 annotation 검사는 [VisDrone validator](docs/visdrone-validation.md)를 사용할 수 있습니다. `--check-images`로 이미지 decoding·bbox 경계 검사도 선택할 수 있으며 전체 데이터 검증을 대신하지 않습니다.
@@ -42,13 +42,13 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 
 ## Evaluation metrics
 
-계획한 metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latency`입니다. [평가 정책](docs/evaluation.md)에 evaluator, 객체 면적 기준과 timing 조건을 기록합니다. tiny/small 크기 구간과 `AP_small` 정의는 실제 evaluator 도입 전에 확정합니다.
+metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latency`입니다. [평가 정책](docs/evaluation.md)에 evaluator, 객체 면적 기준과 timing 조건을 기록합니다. 현재 `AP_small`은 원본 면적의 COCO small 구간으로 정의했으며, UAV 전용 tiny 세부 구간은 후속 비교 전에 확정합니다.
 
 ## Planned experiments
 
 | Experiment | Hypothesis / comparison | Status |
 | --- | --- | --- |
-| YOLO baseline | 첫 기준 성능과 failure 유형 확보 | 계획 |
+| YOLO baseline | 첫 기준 성능과 failure 유형 확보 | smoke·예비 pilot 완료; 본학습 예정 |
 | RT-DETR baseline | 동일 dataset/evaluator 조건에서 검출 구조 비교 | 계획 |
 | Input resolution | 더 높은 해상도가 small-object 정확도와 처리 시간에 미치는 영향 | 계획 |
 | Tiled inference | tile 크기·overlap·merge 정책에 따른 Recall과 latency 비교 | 계획 |
@@ -64,9 +64,14 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 ├── .gitignore
 ├── .github/workflows/ci.yml   # push·PR 합성 테스트 및 구조 검증
 ├── requirements.txt          # Pillow 고정 버전; 모델 패키지 없음
+├── requirements-yolo.txt     # 선택적인 고정 YOLO 학습·평가 환경
+├── requirements-metrics.txt  # 모델 없는 CPU metric helper·CI
 ├── configs/
 │   ├── README.md
-│   └── experiment.example.toml
+│   ├── experiment.example.toml
+│   ├── yolo-smoke.toml
+│   ├── yolo-pilot.toml
+│   └── yolo-baseline.toml
 ├── src/
 │   ├── README.md
 │   └── uav_small_target/
@@ -74,7 +79,8 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │       ├── visdrone_annotations.py
 │       ├── visdrone_validation.py
 │       ├── visdrone_preview.py
-│       └── visdrone_yolo.py
+│       ├── visdrone_yolo.py
+│       └── yolo_experiment.py
 ├── scripts/
 │   ├── README.md
 │   ├── validate_structure.py
@@ -82,7 +88,9 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── preview_visdrone.py
 │   ├── convert_visdrone_yolo.py
 │   ├── extract_visdrone.py
-│   └── audit_visdrone_preparation.py
+│   ├── audit_visdrone_preparation.py
+│   ├── run_yolo_experiment.py
+│   └── summarize_yolo_run.py
 ├── tests/
 │   ├── README.md
 │   ├── test_visdrone_validation.py
@@ -90,11 +98,14 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── test_visdrone_preview.py
 │   ├── test_visdrone_yolo.py
 │   ├── test_visdrone_extraction.py
-│   └── test_visdrone_preparation_audit.py
+│   ├── test_visdrone_preparation_audit.py
+│   └── test_yolo_experiment.py
 ├── notebooks/README.md
 ├── experiments/
 │   ├── README.md
-│   └── template.md           # 미실행 실험 기록 양식
+│   ├── template.md           # 미실행 실험 기록 양식
+│   ├── exp-001-yolo11n-smoke/README.md
+│   └── exp-002-yolo11n-pilot-mps/  # README·실제 요약 JSON
 ├── results/
 │   ├── README.md
 │   ├── figures/README.md
@@ -112,6 +123,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   │   └── summary.json
 │   ├── dependencies.md
 │   ├── evaluation.md
+│   ├── yolo-baseline.md
 │   ├── git-workflow.md
 │   └── ci.md
 └── assets/README.md
@@ -121,7 +133,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 
 ## Setup
 
-초기 기준은 **Python 3.11**입니다. 설치된 Python으로 표준 라이브러리 기반 검증을 실행할 수 있으며, model framework 호환성은 향후 확인합니다. [Dependency 전략](docs/dependencies.md)을 참고하세요.
+기준은 **Python 3.11**입니다. 표준 라이브러리 기반 검증과 가벼운 데이터 환경을 유지하고, YOLO는 별도 가상환경을 사용합니다. 현재 M1/macOS의 모델 환경을 확인했으며 CUDA는 미검증입니다. [Dependency 전략](docs/dependencies.md)을 참고하세요.
 
 새 컴퓨터에서 준비하는 예시:
 
@@ -135,7 +147,7 @@ python -m pip install -r requirements.txt
 python scripts/validate_structure.py
 ```
 
-`requirements.txt`는 이미지 검증·시각화·label 변환에 사용하는 `Pillow==12.3.0`만 설치합니다. 구조 검증과 기본 metadata 검사는 외부 패키지 없이 실행할 수 있습니다. 이 단계에 실행할 학습·추론 명령은 없습니다.
+`requirements.txt`는 이미지 검증·시각화·label 변환에 사용하는 `Pillow==12.3.0`만 설치합니다. 구조 검증과 기본 metadata 검사는 외부 패키지 없이 실행할 수 있습니다. 모델 실행은 [YOLO 안내](docs/yolo-baseline.md)의 `requirements-yolo.txt`, 별도 `.venv-yolo/`, 로컬 weights 및 실행 설정을 사용합니다.
 
 데이터 없이 검증 도구를 확인하려면 아래 명령을 사용합니다. 테스트는 임시 합성 예제를 생성·제거합니다.
 
@@ -159,7 +171,19 @@ python scripts/convert_visdrone_yolo.py --help
 
 ## Results and visualizations
 
-**아직 실험 결과, 성능 표, figure/GIF가 없습니다.** 실제 측정 후 [결과 안내](results/README.md)에 따라 [tables](results/tables/), [figures](results/figures/)와 experiment 기록을 연결하고 이 절에 추가합니다.
+첫 [YOLO11n 1-epoch pilot](experiments/exp-002-yolo11n-pilot-mps/README.md)을 실제 실행했습니다. train 6,471 / val 548장, imgsz 640, MPS, seed 42입니다. 아래 AP는 **target-only COCO bbox / maxDet 500 / 원본 면적** 기준으로 계산하며 공식 VisDrone ignore 규칙은 적용하지 않습니다. 1 epoch는 수렴한 baseline이 아닙니다.
+
+| Pilot metric | Measured value |
+| --- | ---: |
+| COCO mAP50 | 8.55% |
+| COCO mAP50-95 | 4.58% |
+| AP_small (original area ≤ 1,024 px²) | 1.42% |
+| Precision / Recall (conf 0.25, IoU 0.50, global matching) | 54.21% / 21.40% |
+| FPS / mean latency (20 decoded arrays, FP32, batch 1) | 36.27 / 27.57 ms |
+
+![Pilot area AP](results/figures/exp-002-yolo11n-pilot-mps-ap.png)
+
+[실제 CSV](results/tables/exp-002-yolo11n-pilot-mps.csv), [실험·한계·failure 기록](experiments/exp-002-yolo11n-pilot-mps/README.md)에 원본 output hash와 평가·timing 조건을 연결했습니다. timing은 disk/decode를 제외한 20장 sample이며 outlier를 포함합니다. 장시간 실시간 처리속도나 본학습 성능으로 일반화하지 않습니다. raw dataset·prediction 그림·weights는 로컬에만 보관합니다.
 
 ## Roadmap
 
@@ -173,9 +197,12 @@ python scripts/convert_visdrone_yolo.py --help
 - [x] 공식 train/val 다운로드·CRC/hash·이미지/annotation 검사·sample 검토
 - [x] 0면적 예외를 기록한 변환 v2 및 전체 이미지/label·좌표 audit
 - [ ] 2019 release별 license 적용 확정 (현재 학술 이용 안내 확인; 데이터 비공개 유지)
-- [ ] YOLO baseline 구현 및 검증
+- [x] YOLO11n 학습·평가·AP_small·P/R·timing runner 구현 및 smoke 검증
+- [x] 전체 데이터 YOLO11n 예비 pilot 평가·failure 집계
+- [ ] YOLO 본학습 및 수렴 검토
 - [ ] RT-DETR baseline 구현 및 검증
-- [ ] 크기별 evaluation 정의 및 failure analysis
+- [x] 원본 면적 COCO AP_small 및 pilot 기초 failure analysis
+- [ ] UAV tiny 세부 구간과 가림·밀집도별 failure 분석
 - [ ] 입력 해상도 비교
 - [ ] Tiled inference 비교
 - [ ] Augmentation 비교
