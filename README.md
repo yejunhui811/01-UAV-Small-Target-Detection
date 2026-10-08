@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 실제 VisDrone 준비와 YOLO11n runner·MPS smoke·전체 train/val 1-epoch pilot을 완료했습니다. 50-epoch 본학습과 RT-DETR은 아직 실행하지 않았습니다.** [데이터 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md), [YOLO 실행 안내](docs/yolo-baseline.md), [실제 pilot 결과·failure 분석](experiments/exp-002-yolo11n-pilot-mps/README.md)을 참고하세요. pilot은 수렴한 baseline이나 공식 VisDrone 점수가 아닙니다.
+**현재 단계: 실제 VisDrone 준비와 YOLO11n runner·MPS smoke·전체 train/val 1-epoch pilot을 완료했습니다. 50-epoch 본학습은 [전용 설정·진행 기록](experiments/exp-003-yolo11n-baseline-mps/README.md)으로 구분하며 최종 결과는 아직 없습니다. RT-DETR은 미실행입니다.** [데이터 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md), [YOLO 실행 안내](docs/yolo-baseline.md), [실제 pilot 결과·failure 분석](experiments/exp-002-yolo11n-pilot-mps/README.md)을 참고하세요. pilot은 수렴한 baseline이나 공식 VisDrone 점수가 아닙니다.
 
 ## Project overview
 
@@ -71,7 +71,8 @@ metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latenc
 │   ├── experiment.example.toml
 │   ├── yolo-smoke.toml
 │   ├── yolo-pilot.toml
-│   └── yolo-baseline.toml
+│   ├── yolo-baseline.toml
+│   └── yolo-baseline-mps.toml
 ├── src/
 │   ├── README.md
 │   └── uav_small_target/
@@ -90,7 +91,8 @@ metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latenc
 │   ├── extract_visdrone.py
 │   ├── audit_visdrone_preparation.py
 │   ├── run_yolo_experiment.py
-│   └── summarize_yolo_run.py
+│   ├── summarize_yolo_run.py
+│   └── start_yolo_job.py
 ├── tests/
 │   ├── README.md
 │   ├── test_visdrone_validation.py
@@ -105,7 +107,8 @@ metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latenc
 │   ├── README.md
 │   ├── template.md           # 미실행 실험 기록 양식
 │   ├── exp-001-yolo11n-smoke/README.md
-│   └── exp-002-yolo11n-pilot-mps/  # README·실제 요약 JSON
+│   ├── exp-002-yolo11n-pilot-mps/  # README·실제 요약 JSON
+│   └── exp-003-yolo11n-baseline-mps/README.md # 최종 결과 pending
 ├── results/
 │   ├── README.md
 │   ├── figures/README.md

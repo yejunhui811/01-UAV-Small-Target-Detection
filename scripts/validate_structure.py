@@ -33,6 +33,8 @@ REQUIRED_FILES = (
     "docs/dataset-record-template.md", "docs/visdrone-validation.md",
     "requirements-yolo.txt", "requirements-metrics.txt", "configs/yolo-smoke.toml", "configs/yolo-pilot.toml",
     "configs/yolo-baseline.toml", "scripts/run_yolo_experiment.py",
+    "configs/yolo-baseline-mps.toml", "scripts/start_yolo_job.py",
+    "experiments/exp-003-yolo11n-baseline-mps/README.md",
     "src/uav_small_target/yolo_experiment.py", "tests/test_yolo_experiment.py", "docs/yolo-baseline.md",
     "scripts/summarize_yolo_run.py", "experiments/exp-001-yolo11n-smoke/README.md",
     "experiments/exp-002-yolo11n-pilot-mps/README.md",
@@ -102,7 +104,7 @@ def main() -> int:
     # Parse real experiment configurations without importing model packages.
     sys.path.insert(0, str(ROOT / "src"))
     from uav_small_target.yolo_experiment import load_config
-    for name in ("smoke", "pilot", "baseline"):
+    for name in ("smoke", "pilot", "baseline", "baseline-mps"):
         try:
             load_config(ROOT / f"configs/yolo-{name}.toml")
         except (OSError, ValueError, KeyError, TypeError) as exc:

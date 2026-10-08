@@ -11,13 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from uav_small_target.yolo_experiment import (
     box_iou, coco_ground_truth, coco_metrics, contained, failure_summary,
-    load_config, select_records, write_json,
+    load_config, select_records, write_json, progress_record, write_progress,
 )
 
 
 class ConfigurationTests(unittest.TestCase):
     def test_all_committed_configs_parse(self):
-        for name in ("smoke", "pilot", "baseline"):
+        for name in ("smoke", "pilot", "baseline", "baseline-mps"):
             cfg = load_config(ROOT / f"configs/yolo-{name}.toml")
             self.assertEqual(cfg["train"]["optimizer"], "SGD")
 
@@ -34,6 +34,24 @@ class ConfigurationTests(unittest.TestCase):
             contained(ROOT, "../outside")
         with self.assertRaises(ValueError):
             contained(ROOT, "/tmp/outside")
+
+    def test_progress_does_not_claim_completion_before_evaluation(self):
+        progress = progress_record(50, 50, {"mAP": 0.3, "invalid": float("nan")})
+        self.assertEqual(progress["status"], "running")
+        self.assertEqual(progress["epoch_metrics"]["mAP"], 0.3)
+        self.assertIsNone(progress["epoch_metrics"]["invalid"])
+        self.assertEqual(progress["non_finite_metric_keys"], ["invalid"])
+        with self.assertRaises(ValueError):
+            progress_record(51, 50)
+
+    def test_atomic_progress_replacement_produces_valid_json_without_temp_files(self):
+        import json
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory)
+            write_progress(run, progress_record(1, 50))
+            write_progress(run, progress_record(2, 50))
+            self.assertEqual(json.loads((run / "progress.json").read_text())["completed_epochs"], 2)
+            self.assertEqual(sorted(p.name for p in run.iterdir()), ["progress.json"])
 
     def test_pilot_rejects_subsets_and_config_typo(self):
         content = (ROOT / "configs/yolo-pilot.toml").read_text()

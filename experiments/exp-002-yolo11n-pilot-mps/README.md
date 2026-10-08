@@ -63,6 +63,6 @@ Timing 20장 중 한 장은 304.48 ms였습니다. outlier를 제거하지 않�
 - 학습 후 전체 원본·변환 hash/inventory와 381,963개 target 좌표 audit를 다시 실행하여 passed를 확인했습니다(`metadata/audit-after-yolo-v1.json`).
 - 모델 환경 합성 regression 77개, 별도 no-site metadata 17개 통과. MPS 전체 train/val 및 실제 CPU 한 장 inference를 확인했습니다.
 - CUDA·CPU 학습, 본학습 수렴, 공식 VisDrone evaluator·ignore loss masking, scene leakage와 장시간 timing benchmark는 미검증입니다.
-- 기본 warm-up 3 epochs 중 첫 epoch이며 일부 MPS 연산은 deterministic 구현이 없습니다. seed만으로 bitwise 재현을 보장하지 않습니다. 공식 train 내부 중복과 release별 license 미확정은 데이터 준비 기록의 한계를 유지합니다.
+- 설치된 8.4.174는 1-epoch run의 effective warm-up을 0으로 줄입니다. 이전 “3-epoch warm-up 중 첫 epoch” 설명을 source 확인 후 정정했고 metric은 그대로입니다. 일부 MPS 연산은 deterministic 구현이 없어 bitwise 재현을 보장하지 않습니다. 공식 train 내부 중복과 release별 license 미확정은 데이터 준비 기록의 한계를 유지합니다.
 
 **결론:** 실제 학습·평가·기록 pipeline이 동작하고 초기 small-object miss가 확인됐습니다. 먼저 [50-epoch 본학습 설정](../../configs/yolo-baseline.toml)을 적절한 장치에서 실행하고 수렴·동일 evaluator 기준을 확인한 뒤, RT-DETR 및 해상도 비교로 넘어갑니다. 이 1-epoch 결과로 개선 효과나 YOLO의 최종 성능을 주장하지 않습니다.
