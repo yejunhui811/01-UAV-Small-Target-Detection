@@ -1,5 +1,7 @@
 # Scripts
 
+`start_yolo_job.py`는 clean commit에서 장시간 로컬 학습 process를 분리해 실행하고 상태·로그를 보존한다. [50-epoch 실행 안내](../experiments/exp-003-yolo11n-baseline-mps/README.md)를 따른다. `--status <id>`는 읽기 전용이며 `--export`는 성공 후 작은 검토용 aggregate만 생성한다. 자동 Git commit/push/merge는 하지 않는다.
+
 저장소 root에서 `python3 scripts/validate_structure.py`를 실행하면 기반 구조, 로컬 문서 링크, TOML parsing, ignore 규칙과 staged 파일을 확인한다. 외부 패키지 설치, 네트워크 접근, 데이터 다운로드, 학습을 수행하지 않는다.
 
 `python scripts/run_yolo_experiment.py --help`는 YOLO11n 학습 → validation → 원본 면적 COCO AP_small → 고정 operating point P/R·failure 집계 → 동기화 timing을 한 run에 기록한다. `requirements-yolo.txt`를 설치하고 [baseline 안내](../docs/yolo-baseline.md)의 설정·실행 명령을 따른다. `--dry-run`은 표준 라이브러리로 설정만 검증하며 실제 실행은 기존 run을 덮어쓰지 않는다.

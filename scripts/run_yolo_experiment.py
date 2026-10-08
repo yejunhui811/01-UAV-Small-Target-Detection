@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from uav_small_target.yolo_experiment import (
     VERSIONS, coco_ground_truth, coco_metrics, contained, failure_summary,
-    load_config, now, prepare_dataset, sha256, write_json,
+    load_config, now, prepare_dataset, progress_record, sha256, write_json, write_progress,
 )
 
 
@@ -57,6 +57,15 @@ def execute(config_path, cfg, run):
     # Work in ignored run directory: third-party incidental files stay local.
     os.chdir(run)
     model = YOLO(str(weights))
+    model.add_callback("on_train_start", lambda trainer: write_progress(run,
+        progress_record(0, cfg["train"]["epochs"])))
+    def record_epoch_progress(trainer):
+        # final_eval also calls this hook with an extra logging step. It is not
+        # another trained epoch, and best-checkpoint metrics are not epoch metrics.
+        if trainer.validator.training:
+            write_progress(run, progress_record(trainer.epoch + 1,
+                cfg["train"]["epochs"], trainer.metrics))
+    model.add_callback("on_fit_epoch_end", record_epoch_progress)
     model.train(**shared, name="train", epochs=train["epochs"], seed=cfg["experiment"]["seed"],
         deterministic=True, optimizer=train["optimizer"], lr0=train["lr0"], momentum=train["momentum"],
         weight_decay=train["weight_decay"], mosaic=train["mosaic"], close_mosaic=train["close_mosaic"],
@@ -64,6 +73,10 @@ def execute(config_path, cfg, run):
         conf=evaluation["conf"], iou=evaluation["nms_iou"],
         hsv_h=0.015, hsv_s=0.7, hsv_v=0.4, degrees=0.0, translate=0.1, scale=0.5,
         shear=0.0, perspective=0.0, flipud=0.0, fliplr=0.5, mixup=0.0, cutmix=0.0)
+    completed_epochs = model.trainer.epoch + 1
+    if completed_epochs != train["epochs"]:
+        raise ValueError(f"Training ended after {completed_epochs}/{train['epochs']} requested epochs")
+    write_progress(run, {**progress_record(completed_epochs, train["epochs"]), "phase": "evaluation"})
     best = run / "train/weights/best.pt"
     if not best.is_file():
         raise ValueError("Training produced no best checkpoint")
@@ -123,7 +136,7 @@ def execute(config_path, cfg, run):
         "device_synchronization": "torch.mps/cuda synchronize before and after; CPU synchronous",
         "confidence": 0.25, "nms_iou": evaluation["nms_iou"], "max_det": evaluation["max_det"],
         "precision": "FP32", "sample": "first selected val images in lexical order", "seconds": seconds}
-    results = {"kind": cfg["experiment"]["kind"], "trained_epochs": train["epochs"],
+    results = {"kind": cfg["experiment"]["kind"], "trained_epochs": completed_epochs,
         "selected_images": {s: len(rows) for s, rows in splits.items()}, "coco": coco,
         "fixed_operating_point": {k: v for k, v in failures.items() if k != "worst_cases"},
         "timing": timing, "best_weights_sha256": sha256(best),
@@ -156,15 +169,21 @@ def main(argv=None):
         "experiment": cfg["experiment"], "dataset_manifest_sha256": cfg["dataset"]["manifest_sha256"],
         "pretrained_weights_sha256": cfg["model"]["weights_sha256"]}
     write_json(run / "provenance.json", provenance)
+    write_progress(run, {**progress_record(0, cfg["train"]["epochs"]), "phase": "preparing", "pid": os.getpid()})
     try:
         execute(config_path, cfg, run)
     except BaseException as exc:
         provenance.update(status="interrupted" if isinstance(exc, KeyboardInterrupt) else "failed",
                           finished_at=now(), error=f"{type(exc).__name__}: {exc}")
         write_json(run / "provenance.json", provenance)
+        write_progress(run, {**json.loads((run / "progress.json").read_text()),
+                             "status": provenance["status"], "error": provenance["error"], "updated_at": now()})
         raise
     provenance.update(status="completed", finished_at=now())
     write_json(run / "provenance.json", provenance)
+    write_progress(run, {**progress_record(cfg["train"]["epochs"], cfg["train"]["epochs"]),
+                         "status": "completed", "phase": "completed",
+                         "metric_protocol": "Final evaluation completed; measurements are in metrics.json"})
     print(f"Completed: {run}")
     return 0
 
