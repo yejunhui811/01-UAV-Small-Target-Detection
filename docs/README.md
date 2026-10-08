@@ -2,6 +2,7 @@
 
 - [Dataset management](dataset.md)
 - [Dataset acquisition record template](dataset-record-template.md)
+- [VisDrone metadata validator](visdrone-validation.md)
 - [Dependency strategy](dependencies.md)
 - [Evaluation policy](evaluation.md)
 - [Git workflow](git-workflow.md)
