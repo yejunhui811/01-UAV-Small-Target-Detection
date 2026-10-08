@@ -21,6 +21,8 @@ REQUIRED_FILES = (
     "scripts/validate_visdrone.py", "tests/README.md", "tests/test_visdrone_validation.py",
     "tests/test_visdrone_images.py",
     ".github/workflows/ci.yml", "docs/ci.md",
+    "src/uav_small_target/visdrone_annotations.py", "src/uav_small_target/visdrone_preview.py",
+    "scripts/preview_visdrone.py", "tests/test_visdrone_preview.py", "docs/visdrone-preview.md",
     "docs/dataset-record-template.md", "docs/visdrone-validation.md",
 )
 IGNORED_PROBES = (

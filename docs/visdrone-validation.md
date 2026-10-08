@@ -81,6 +81,8 @@ near-duplicate/scene leakage, archive 무결성, release·이용 조건, 공식 
 
 SHA-256 일치는 **파일 bytes의 완전 중복**만 찾는다. 이미지 내용이 같아도 압축이나 metadata가 다르면 검출하지 못한다. 중복 검사를 생략하면 `duplicate_check`가 `not_run`으로 표시된다. 제공된 실제 split 수량과의 비교도 별도 기록이 필요하다.
 
+단일 pair의 원본 bbox·class를 눈으로 검토할 때는 [annotation preview](visdrone-preview.md)를 사용할 수 있다. validator와 core annotation parser를 공유하며 전체 dataset 검증을 대신하지 않는다.
+
 ## Synthetic verification
 
 ```bash
