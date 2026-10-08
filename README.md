@@ -60,6 +60,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 ├── AGENTS.md                 # Codex 운영 및 연구·Git 규칙
 ├── README.md
 ├── .gitignore
+├── .github/workflows/ci.yml   # push·PR 합성 테스트 및 구조 검증
 ├── requirements.txt          # Pillow 고정 버전; 모델 패키지 없음
 ├── configs/
 │   ├── README.md
@@ -92,7 +93,8 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 │   ├── visdrone-validation.md
 │   ├── dependencies.md
 │   ├── evaluation.md
-│   └── git-workflow.md
+│   ├── git-workflow.md
+│   └── ci.md
 └── assets/README.md
 ```
 
@@ -142,6 +144,7 @@ python scripts/validate_visdrone.py --help
 - [x] VisDrone 공식 자료 조사 및 release/split·데이터 준비 계획 문서화
 - [x] 합성 예제로 테스트한 annotation·파일 대응 검증 도구 구현
 - [x] 합성 PNG/JPEG 기반 이미지 decoding·bbox 경계 검사 추가
+- [x] GitHub Actions 합성 테스트·구조 검증 workflow 구성
 - [ ] 실제 archive별 이용 조건 확인, 로컬 데이터 준비·검증
 - [ ] YOLO baseline 구현 및 검증
 - [ ] RT-DETR baseline 구현 및 검증
@@ -154,3 +157,5 @@ python scripts/validate_visdrone.py --help
 ## Git/GitHub workflow
 
 최신 `main`에서 별도 branch를 만들고 변경 → 검증 → `git add` → commit → push → Pull Request 검토 → 사용자 승인 후 merge 순서로 진행합니다. PR 생성과 push만으로는 `main`에 반영되지 않습니다. `main` merge에는 사용자의 명시적 허가가 필요합니다. merge 후에는 로컬 `main`을 동기화하고 다음 작업 branch를 만듭니다. 명령의 의미와 이후 흐름은 [Git 안내](docs/git-workflow.md), 프로젝트 운영 규칙은 [AGENTS.md](AGENTS.md)를 참고하세요.
+
+[GitHub Actions CI](docs/ci.md)는 branch push와 `main` 대상 PR에서 Python 3.11 합성 테스트·dependency·구조 검증을 실행합니다. PR의 Checks에서 최신 commit의 통과 여부를 확인하세요. CI 성공도 실제 연구 성능이나 merge 승인을 의미하지 않습니다.

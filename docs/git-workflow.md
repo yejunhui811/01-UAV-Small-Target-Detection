@@ -40,6 +40,8 @@ Pull Request는 GitHub에서 base `main`과 compare 작업 branch의 차이를 �
 
 PR에서 base `main`, compare 작업 branch가 맞는지 확인하고, Files changed에서 변경사항을 검토한다. PR 생성과 push만으로는 main에 반영되지 않는다. 사용자의 명시적 승인 후 merge하면 작업 내용이 main에 반영된다.
 
+push·PR마다 [CI](ci.md)가 합성 테스트와 구조 검증을 실행한다. PR Checks와 Actions에서 최신 commit의 결과를 확인한다. 실패·취소·대기는 통과가 아니며, 성공해도 변경사항 검토와 사용자 merge 승인은 필요하다. CI 자체는 merge하지 않는다.
+
 ## Sync main after merge
 
 GitHub에서 merge를 완료한 뒤, 로컬 변경사항이 없는지 `git status`로 확인하고 main을 동기화한다:
