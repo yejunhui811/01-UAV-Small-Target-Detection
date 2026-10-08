@@ -7,3 +7,5 @@
 `visdrone_yolo.py`는 공통 parser를 사용해 로컬 train/val과 선택적인 test-dev를 YOLO 형식으로 변환한다. 원본 이미지 bytes와 annotation provenance를 보존하며 입력 오류가 있으면 중단한다. [변환 정책](../docs/visdrone-yolo.md)을 따른다.
 
 `visdrone_annotations.py`는 validator와 preview가 공유하는 표준 라이브러리 기반 GT parser이다. `visdrone_preview.py`는 한 image/TXT pair의 bbox·class·검토 경고를 PNG/JSON으로 저장한다. [Preview 안내](../docs/visdrone-preview.md)를 따른다.
+
+변환 v2는 기본 strict 동작을 유지하며 명시적인 0면적 제외 옵션만 추가했다. 실제 train/val 준비·audit는 [snapshot 기록](../docs/datasets/visdrone2019-det-2026-10-08/README.md)에 있다.

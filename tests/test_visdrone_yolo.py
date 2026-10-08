@@ -15,6 +15,7 @@ REPOSITORY = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY / "src"))
 from uav_small_target.visdrone_yolo import convert_dataset
 from uav_small_target.visdrone_validation import SPLIT_DIRECTORIES
+from uav_small_target.visdrone_annotations import AnnotationRowError, parse_annotation_row
 
 
 class ConversionTests(unittest.TestCase):
@@ -107,6 +108,33 @@ class ConversionTests(unittest.TestCase):
         for split in ("train", "val"):
             self.assertEqual((self.output / f"labels/{split}/sample.txt").read_bytes(), b"")
             self.assertEqual(report["splits"][split]["empty_label_images"], 1)
+
+    def test_zero_area_exclusion_is_explicit_and_preserves_original_rows(self):
+        self.sample(rows="10,20,20,10,1,4,0,0\n2,3,4,0,1,4,0,0\n2,3,0,4,0,0,0,0\n")
+        with self.assertRaises(AnnotationRowError):
+            parse_annotation_row("2,3,4,0,1,4,0,0")
+        with self.assertRaises(ValueError):
+            self.convert()
+        report = self.convert(zero_area_policy="exclude")
+        self.assertEqual(report["conversion_version"], "visdrone-yolo-v2")
+        self.assertEqual(report["splits"]["train"]["source_rows"], 3)
+        self.assertEqual(report["splits"]["train"]["target_rows"], 1)
+        self.assertEqual(report["splits"]["train"]["excluded_zero_area_rows"], 2)
+        rows = self.records()[0]["rows"]
+        self.assertEqual(rows[1]["height"], 0)
+        self.assertEqual(rows[2]["width"], 0)
+        self.assertTrue(all(r["yolo"] is None and r["exclusion_reason"] == "zero_area_bbox" for r in rows[1:]))
+
+    def test_zero_area_policy_never_allows_negative_or_other_core_errors(self):
+        for row in ("2,3,-4,0,1,4,0,0", "2,3,4,0,1,12,0,0", "2,3,4,0,2,4,0,0",
+                    "2,3,nan,0,1,4,0,0", "bad"):
+            with self.subTest(row=row):
+                self.sample(rows=row)
+                with self.assertRaises(ValueError):
+                    self.convert(zero_area_policy="exclude")
+                self.assertFalse(self.output.exists())
+        with self.assertRaises(ValueError):
+            self.convert(zero_area_policy="silent")
 
     def test_invalid_rows_or_target_geometry_abort_without_publishing(self):
         for rows in ("bad", "0,0,1,1,1,12,0,0", "0,0,1,1,nan,1,0,0",

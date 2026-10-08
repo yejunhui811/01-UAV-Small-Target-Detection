@@ -1,6 +1,7 @@
 """Validate the project structure without installing packages or running models."""
 
 from pathlib import Path
+import json
 import re
 import subprocess
 import sys
@@ -25,6 +26,10 @@ REQUIRED_FILES = (
     "scripts/preview_visdrone.py", "tests/test_visdrone_preview.py", "docs/visdrone-preview.md",
     "src/uav_small_target/visdrone_yolo.py", "scripts/convert_visdrone_yolo.py",
     "tests/test_visdrone_yolo.py", "docs/visdrone-yolo.md",
+    "scripts/extract_visdrone.py", "tests/test_visdrone_extraction.py", "docs/visdrone-extraction.md",
+    "scripts/audit_visdrone_preparation.py", "tests/test_visdrone_preparation_audit.py",
+    "docs/datasets/visdrone2019-det-2026-10-08/README.md",
+    "docs/datasets/visdrone2019-det-2026-10-08/summary.json",
     "docs/dataset-record-template.md", "docs/visdrone-validation.md",
 )
 IGNORED_PROBES = (
@@ -36,6 +41,8 @@ IGNORED_PROBES = (
     ".aws/credentials", "cache/item", ".cache/item", ".venv/bin/python",
     "src/__pycache__/module.pyc", "notebooks/.ipynb_checkpoints/test.ipynb",
     ".DS_Store", "temporary.tmp", ".uav-convert-interrupted/annotations.jsonl",
+    ".uav-extract-interrupted/raw/sample.jpg",
+    "docs/datasets/sample/raw.jpg", "docs/datasets/sample/annotations.txt",
 )
 TRACKABLE_PROBES = REQUIRED_FILES + (
     "results/figures/reviewed.png", "results/tables/measured.csv",
@@ -54,6 +61,11 @@ def main() -> int:
     for relative in REQUIRED_FILES:
         if not (ROOT / relative).is_file():
             errors.append(f"Missing file: {relative}")
+        elif Path(relative).suffix == ".json":
+            try:
+                json.loads((ROOT / relative).read_text())
+            except json.JSONDecodeError as exc:
+                errors.append(f"Invalid JSON in {relative}: {exc}")
 
     # Check local paths only; no network access or remote URL verification.
     for relative in REQUIRED_FILES:
@@ -103,6 +115,7 @@ def main() -> int:
             print(f"FAIL: {error}", file=sys.stderr)
         return 1
     print("PASS: required files and directory placeholders")
+    print("PASS: committed snapshot JSON parsing")
     print("PASS: local Markdown link paths (remote URLs/anchors not checked)")
     print("PASS: TOML parsing and planned template status")
     print("PASS: dataset/weight/secret/cache/output ignore probes; docs/figures allowed")

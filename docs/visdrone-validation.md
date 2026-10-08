@@ -1,6 +1,6 @@
 # VisDrone metadata and image validator
 
-기본 구현은 **파일 대응과 annotation metadata 검사**이며 Python 3.11 표준 라이브러리만 사용한다. **`--check-images`를 선택하면 Pillow로 이미지 decoding과 bbox 경계 검사도 수행한다.** 원본을 읽기만 하며 데이터 다운로드, label 변환·삭제·clipping, 학습·추론·모델 metric 계산은 수행하지 않는다. [데이터 준비 계획](dataset.md)의 전체 checklist 중 일부를 구현한 것이며, 실제 VisDrone 데이터에서는 아직 실행하지 않았다.
+기본 구현은 **파일 대응과 annotation metadata 검사**이며 Python 3.11 표준 라이브러리만 사용한다. **`--check-images`를 선택하면 Pillow로 이미지 decoding과 bbox 경계 검사도 수행한다.** 원본을 읽기만 하며 데이터 다운로드, label 변환·삭제·clipping, 학습·추론·모델 metric 계산은 수행하지 않는다. [데이터 준비 계획](dataset.md)의 전체 checklist 중 일부를 구현한 것이며, 실제 train/val 검사도 실행했다. [Snapshot 기록](datasets/visdrone2019-det-2026-10-08/README.md)에 raw error/warning을 보존한다.
 
 ## Input and command
 
@@ -12,7 +12,7 @@
 python3 scripts/validate_visdrone.py --help
 ```
 
-**아래 명령은 실제 데이터가 준비된 후 사용할 예시이며 이번 단계에서 실행하지 않았다.** 로컬 경로는 [보관 구조](dataset.md)에 맞춘다.
+**아래는 검사 사용 예시이다. 실제 train/val에서 이미지·중복 옵션을 켠 실행 결과는 snapshot 기록을 따른다.** 로컬 경로는 [보관 구조](dataset.md)에 맞춘다.
 
 ```bash
 python scripts/validate_visdrone.py \
@@ -75,9 +75,9 @@ JSON schema는 **version 2**이다. 기존 metadata 집계와 issue 형식은 �
 
 ## Limits
 
-`--check-images`를 생략하면 이미지 decoding과 bbox 경계는 `not_checked`에 남으며 비어 있지 않은 손상 이미지도 기본 검사만으로 통과할 수 있다. 옵션을 사용해도 모든 종류의 이미지 손상을 검출한다고 보장하지 않는다. decoder가 읽을 수 있는 시각적 손상·내용 오류는 별도 sample 시각화로 확인해야 한다. 실제 데이터에서는 아직 테스트하지 않았다.
+`--check-images`를 생략하면 이미지 decoding과 bbox 경계는 `not_checked`에 남으며 비어 있지 않은 손상 이미지도 기본 검사만으로 통과할 수 있다. 옵션을 사용해도 모든 종류의 이미지 손상을 검출한다고 보장하지 않는다. decoder가 읽을 수 있는 시각적 손상·내용 오류는 별도 sample 시각화로 확인해야 한다. 실제 train/val의 모든 이미지 decoding과 bbox 검사를 실행했으며 내용 검토는 두 sample에 한정했다.
 
-near-duplicate/scene leakage, archive 무결성, release·이용 조건, 공식 evaluator 동등성, 모델 metric은 항상 미검증 범위이다.
+이 validator 자체는 near-duplicate/scene leakage, archive 무결성, release·이용 조건, 공식 evaluator 동등성, 모델 metric을 검사하지 않는다. 이번 archive CRC·hash는 별도 extraction에서 확인했다.
 
 SHA-256 일치는 **파일 bytes의 완전 중복**만 찾는다. 이미지 내용이 같아도 압축이나 metadata가 다르면 검출하지 못한다. 중복 검사를 생략하면 `duplicate_check`가 `not_run`으로 표시된다. 제공된 실제 split 수량과의 비교도 별도 기록이 필요하다.
 
@@ -92,4 +92,4 @@ python -B -m unittest discover -s tests -v
 python scripts/validate_structure.py
 ```
 
-합성 PNG/JPEG/TXT를 임시 폴더에 만들어 정상·오류·CLI 동작을 검사한다. 실제 VisDrone 검증·변환이나 모델 실험은 하지 않았다. 테스트 코드는 [metadata tests](../tests/test_visdrone_validation.py), [image tests](../tests/test_visdrone_images.py), 재사용 API는 [src/uav_small_target/visdrone_validation.py](../src/uav_small_target/visdrone_validation.py)에 있다.
+합성 PNG/JPEG/TXT를 임시 폴더에 만들어 정상·오류·CLI 동작을 검사한다. 이 합성 테스트에서는 실제 데이터를 사용하지 않는다. 실제 준비 결과는 snapshot 기록에 별도로 남긴다. 테스트 코드는 [metadata tests](../tests/test_visdrone_validation.py), [image tests](../tests/test_visdrone_images.py), 재사용 API는 [src/uav_small_target/visdrone_validation.py](../src/uav_small_target/visdrone_validation.py)에 있다.
