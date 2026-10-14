@@ -1,0 +1,16 @@
+# Copy to ignored .codex/config.toml only when that file does not already exist.
+# This is a public, credential-free project configuration, not a user config.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+enabled = true
+required = false
+startup_timeout_sec = 20
+tool_timeout_sec = 45
+enabled_tools = ["resolve-library-id", "query-docs"]
+default_tools_approval_mode = "writes"
+
+[mcp_servers.context7.tools.resolve-library-id]
+output_token_limit = 6000
+
+[mcp_servers.context7.tools.query-docs]
+output_token_limit = 8000

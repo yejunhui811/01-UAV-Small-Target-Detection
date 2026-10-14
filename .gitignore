@@ -258,6 +258,7 @@ raw_videos/
 cache/
 
 # Local secrets and private machine configuration
+.codex/
 .env.*
 !.env.example
 secrets/

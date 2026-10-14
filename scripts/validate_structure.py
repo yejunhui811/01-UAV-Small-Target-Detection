@@ -11,6 +11,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = (
+    "configs/mcp/codex.example.toml", "scripts/check_research_mcp.py", "docs/mcp.md",
     "AGENTS.md", "README.md", ".gitignore", "requirements.txt",
     "configs/README.md", "configs/experiment.example.toml", "src/README.md",
     "scripts/README.md", "scripts/validate_structure.py", "notebooks/README.md",
@@ -41,6 +42,7 @@ REQUIRED_FILES = (
     "results/figures/exp-002-yolo11n-pilot-mps-ap.png",
 )
 IGNORED_PROBES = (
+    ".codex/config.toml", ".codex/auth.json",
     "data/visdrone/sample.jpg", "datasets/sample.png", "weights/model.pt",
     "model.pt", "model.pth", "model.ckpt", "model.onnx", "model.safetensors",
     "outputs/predictions.csv", "runs/train/metrics.csv", "raw_images/image.jpg",
@@ -100,6 +102,11 @@ def main() -> int:
             errors.append(f"Invalid TOML: {exc}")
 
     # Parse real experiment configurations without importing model packages.
+    from check_research_mcp import check_config
+    try:
+        check_config(ROOT / "configs/mcp/codex.example.toml")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        errors.append(f"Invalid research MCP configuration: {exc}")
     sys.path.insert(0, str(ROOT / "src"))
     from uav_small_target.yolo_experiment import load_config
     for name in ("smoke", "pilot", "baseline"):
