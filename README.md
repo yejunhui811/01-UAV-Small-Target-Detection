@@ -2,7 +2,7 @@
 
 UAV 항공영상의 tiny/small object detection 성능을 분석하고 개선하는 연구 및 취업 포트폴리오 프로젝트입니다.
 
-**현재 단계: 실제 VisDrone 준비와 YOLO11n runner·MPS smoke·전체 train/val 1-epoch pilot을 완료했습니다. 50-epoch 본학습은 [전용 설정·진행 기록](experiments/exp-003-yolo11n-baseline-mps/README.md)으로 구분하며 최종 결과는 아직 없습니다. RT-DETR은 미실행입니다.** [데이터 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md), [YOLO 실행 안내](docs/yolo-baseline.md), [실제 pilot 결과·failure 분석](experiments/exp-002-yolo11n-pilot-mps/README.md)을 참고하세요. pilot은 수렴한 baseline이나 공식 VisDrone 점수가 아닙니다.
+**현재 단계: VisDrone 데이터 준비와 전체 train/val의 YOLO11n 50-epoch MPS 기준 실험을 완료했습니다.** [본학습 결과·검증 기록](experiments/exp-003-yolo11n-baseline-mps/README.md), [데이터 준비 기록](docs/datasets/visdrone2019-det-2026-10-08/README.md), [YOLO 실행 안내](docs/yolo-baseline.md)를 참고하세요. 다음 단계는 RT-DETR 기준 실험입니다.
 
 ## Project overview
 
@@ -23,7 +23,7 @@ VisDrone 기반 YOLO 및 RT-DETR baseline에서 시작해 객체 크기별 성�
 
 | Model family | Planned role | Status |
 | --- | --- | --- |
-| YOLO11n | 최초 baseline 및 해상도·tiling·augmentation 비교 | 전체 split 1-epoch pilot 완료; 본학습 예정 |
+| YOLO11n | 최초 baseline 및 해상도·tiling·augmentation 비교 | 전체 split 50-epoch MPS 기준 실험 완료 |
 | RT-DETR | 다른 검출 구조의 baseline 비교 | 미구현 |
 
 YOLO는 Ultralytics 8.4.174 / PyTorch 2.14.1과 공식 COCO-pretrained YOLO11n을 사용하며 버전·hash를 고정합니다. RT-DETR의 variant·구현체·weights는 도입 시 기록합니다.
@@ -48,12 +48,12 @@ metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latenc
 
 | Experiment | Hypothesis / comparison | Status |
 | --- | --- | --- |
-| YOLO baseline | 첫 기준 성능과 failure 유형 확보 | smoke·예비 pilot 완료; 본학습 예정 |
+| YOLO baseline | 첫 기준 성능과 failure 유형 확보 | 50-epoch 학습·평가 완료 |
 | RT-DETR baseline | 동일 dataset/evaluator 조건에서 검출 구조 비교 | 계획 |
 | Input resolution | 더 높은 해상도가 small-object 정확도와 처리 시간에 미치는 영향 | 계획 |
 | Tiled inference | tile 크기·overlap·merge 정책에 따른 Recall과 latency 비교 | 계획 |
 | Augmentation | 동일 조건에서 augmentation 변경과 오류 유형 비교 | 계획 |
-| Failure analysis | 크기·가림·밀집도별 miss, false positive, localization 분석 | 계획 |
+| Failure analysis | 크기·가림·밀집도별 miss, false positive, localization 분석 | 작은 객체 누락 집계 완료; 가림·밀집도별 분석 예정 |
 
 ## Repository structure
 
@@ -108,7 +108,7 @@ metric은 `mAP50`, `mAP50-95`, `AP_small`, `Precision`, `Recall`, `FPS`, `latenc
 │   ├── template.md           # 미실행 실험 기록 양식
 │   ├── exp-001-yolo11n-smoke/README.md
 │   ├── exp-002-yolo11n-pilot-mps/  # README·실제 요약 JSON
-│   └── exp-003-yolo11n-baseline-mps/README.md # 최종 결과 pending
+│   └── exp-003-yolo11n-baseline-mps/  # README·실제 요약 JSON
 ├── results/
 │   ├── README.md
 │   ├── figures/README.md
@@ -174,19 +174,16 @@ python scripts/convert_visdrone_yolo.py --help
 
 ## Results and visualizations
 
-첫 [YOLO11n 1-epoch pilot](experiments/exp-002-yolo11n-pilot-mps/README.md)을 실제 실행했습니다. train 6,471 / val 548장, imgsz 640, MPS, seed 42입니다. 아래 AP는 **target-only COCO bbox / maxDet 500 / 원본 면적** 기준으로 계산하며 공식 VisDrone ignore 규칙은 적용하지 않습니다. 1 epoch는 수렴한 baseline이 아닙니다.
+[YOLO11n 50-epoch MPS 기준 실험](experiments/exp-003-yolo11n-baseline-mps/README.md)을 완료했습니다. VisDrone2019-DET train 6,471장과 val 548장, 입력 크기 640, seed 42를 사용했습니다. AP는 원본 면적 기준 target-only COCO bbox 평가(maxDet 500)입니다. 공식 VisDrone ignore suppression은 적용하지 않았습니다.
 
-| Pilot metric | Measured value |
+| Metric | 50-epoch baseline |
 | --- | ---: |
-| COCO mAP50 | 8.55% |
-| COCO mAP50-95 | 4.58% |
-| AP_small (original area ≤ 1,024 px²) | 1.42% |
-| Precision / Recall (conf 0.25, IoU 0.50, global matching) | 54.21% / 21.40% |
-| FPS / mean latency (20 decoded arrays, FP32, batch 1) | 36.27 / 27.57 ms |
+| COCO mAP50 / mAP50–95 | 27.55% / 15.84% |
+| AP_small (original area ≤ 1,024 px²) | 7.58% |
+| Precision / Recall (conf 0.25, IoU 0.50) | 62.76% / 42.55% |
+| Mean / p95 latency (MPS FP32, batch 1) | 14.35 / 21.04 ms |
 
-![Pilot area AP](results/figures/exp-002-yolo11n-pilot-mps-ap.png)
-
-[실제 CSV](results/tables/exp-002-yolo11n-pilot-mps.csv), [실험·한계·failure 기록](experiments/exp-002-yolo11n-pilot-mps/README.md)에 원본 output hash와 평가·timing 조건을 연결했습니다. timing은 disk/decode를 제외한 20장 sample이며 outlier를 포함합니다. 장시간 실시간 처리속도나 본학습 성능으로 일반화하지 않습니다. raw dataset·prediction 그림·weights는 로컬에만 보관합니다.
+지연시간은 디코딩한 검증 이미지 20장에 대해 전처리부터 결과 생성까지 측정했습니다. [결과 CSV](results/tables/exp-003-yolo11n-baseline-mps.csv), [학습 곡선](results/figures/exp-003-yolo11n-baseline-mps-learning-curves.png), [1-epoch 예비 실험](experiments/exp-002-yolo11n-pilot-mps/README.md)을 함께 참고할 수 있습니다.
 
 ## Roadmap
 
@@ -202,7 +199,7 @@ python scripts/convert_visdrone_yolo.py --help
 - [ ] 2019 release별 license 적용 확정 (현재 학술 이용 안내 확인; 데이터 비공개 유지)
 - [x] YOLO11n 학습·평가·AP_small·P/R·timing runner 구현 및 smoke 검증
 - [x] 전체 데이터 YOLO11n 예비 pilot 평가·failure 집계
-- [ ] YOLO 본학습 및 수렴 검토
+- [x] YOLO11n 50-epoch MPS 본학습 및 학습 곡선·최종 평가 검토
 - [ ] RT-DETR baseline 구현 및 검증
 - [x] 원본 면적 COCO AP_small 및 pilot 기초 failure analysis
 - [ ] UAV tiny 세부 구간과 가림·밀집도별 failure 분석
