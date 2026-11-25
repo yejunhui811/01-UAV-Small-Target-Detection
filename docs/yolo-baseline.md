@@ -16,13 +16,14 @@ curl --fail --location https://github.com/ultralytics/assets/releases/download/v
 
 이미 weights가 있다면 다시 다운로드하여 덮어쓰지 마세요. 공식 release의 COCO-pretrained `yolo11n.pt` SHA-256은 `0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1`입니다. runner는 로컬 fingerprint를 대조하며 자동 다운로드하지 않습니다. 이 hash는 내려받은 파일의 fingerprint이며 별도의 공식 인증 hash와 대조한 것은 아닙니다. Ultralytics는 [AGPL-3.0 / Enterprise license](https://github.com/ultralytics/ultralytics/blob/main/LICENSE)를 제공합니다. 연구 코드는 모델 패키지 소스를 복사하지 않으며 향후 배포 시 이용 조건을 확인합니다.
 
-## Three distinct runs
+## Run configurations
 
 | Configuration | Purpose | Train/val | Epochs | Input | Device |
 | --- | --- | --- | --- | --- | --- |
 | [yolo-smoke.toml](../configs/yolo-smoke.toml) | 실행 경로 확인; 연구 baseline 아님 | seed 42로 32 / 8장 추출 | 1 | 320 | MPS |
 | [yolo-pilot.toml](../configs/yolo-pilot.toml) | 전체 split의 예비 기준; 수렴 판정 불가 | 6,471 / 548장 | 1 | 640 | MPS |
 | [yolo-baseline.toml](../configs/yolo-baseline.toml) | 본학습 계획 | 전체 split | 50 | 640 | CUDA 0, batch 16 |
+| [yolo-baseline-mps.toml](../configs/yolo-baseline-mps.toml) | 로컬 본학습 | 전체 split | 50 | 640 | MPS, batch 8 |
 
 ```bash
 .venv-yolo/bin/python -B scripts/run_yolo_experiment.py --config configs/yolo-smoke.toml --dry-run
@@ -38,6 +39,8 @@ curl --fail --location https://github.com/ultralytics/assets/releases/download/v
 
 ## Recorded outputs
 
+50-epoch 로컬 job의 실행·상태 확인은 [exp-003 기록](../experiments/exp-003-yolo11n-baseline-mps/README.md)의 `start_yolo_job.py`를 사용합니다. 새 job ID, clean working tree와 검증된 commit을 요구합니다. 대화와 별도의 process로 실행하며 macOS에서는 job 수명 동안 idle sleep을 방지합니다. job 상태·console 로그·epoch별 `progress.json`을 로컬에 저장하고, 최종 평가까지 끝난 뒤에만 completed로 표시합니다. 성공 후 branch/HEAD와 working tree가 그대로이면 aggregate만 생성하고 commit/push/merge는 하지 않습니다. 기존 experiment README는 보존하며 summary/CSV/figure를 덮어쓰지 않습니다.
+
 - `config.toml`, `provenance.json`: 실행 명령, Git commit/dirty 여부, 실행 source hash, 설정·dataset·weights hash, 시작·종료 시각
 - `environment.json`: Python·모든 설치 package 버전, 실제 device, CUDA/MPS availability
 - `train/args.yaml`, `train/results.csv`, `train/weights/`: framework의 실제 설정·epoch 로그·best/last checkpoint
@@ -49,7 +52,7 @@ curl --fail --location https://github.com/ultralytics/assets/releases/download/v
 
 ## Evaluation protocol
 
-seed 42와 `deterministic=True`를 기록하지만 PyTorch가 MPS의 `scatter_reduce`와 `index_put_with_accumulate`에 결정적 구현이 없다고 경고했습니다. bitwise 동일 결과를 보장하지 않습니다. pilot의 초기 1 epoch는 기본 `warmup_epochs=3` 구간에 포함되므로 수렴한 baseline으로 해석하지 않습니다. framework는 train 중복 label 4개를 로딩 시 제거했습니다(343,204 → 343,200 target). val 38,759 target은 동일합니다. 원본 및 변환 label 파일은 변경하지 않습니다.
+seed 42와 `deterministic=True`를 기록하지만 PyTorch가 MPS의 `scatter_reduce`와 `index_put_with_accumulate`에 결정적 구현이 없다고 경고했습니다. bitwise 동일 결과를 보장하지 않습니다. 설치된 8.4.174의 `_get_warmup_iterations`는 `min(warmup_epochs, epochs - 1)`을 사용합니다. 따라서 1-epoch pilot의 effective warm-up은 0이고 50-epoch 본학습은 3 epochs입니다. 이전 문서의 “pilot이 3-epoch warm-up 구간” 설명을 정정했으며 실제 metric은 수정하지 않았습니다. framework는 train 중복 label 4개를 로딩 시 제거했습니다(343,204 → 343,200 target). val 38,759 target은 동일합니다. 원본 및 변환 label 파일은 변경하지 않습니다.
 
 **공식 VisDrone evaluator 결과가 아닙니다.** 변환 v2의 score=1, category 1..10 target만 사용하며 0면적 bbox는 제외합니다. ignored/other 영역은 loss mask나 평가 ignore 영역으로 적용되지 않습니다. 따라서 해당 영역의 prediction이 배경 false positive로 처리될 수 있습니다. 이 정책은 향후 RT-DETR 비교에도 같게 적용해야 합니다.
 

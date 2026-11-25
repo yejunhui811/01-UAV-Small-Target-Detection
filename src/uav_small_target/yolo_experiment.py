@@ -37,6 +37,35 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+def progress_record(completed_epochs, planned_epochs, metrics=None):
+    """Report epoch progress, including invalid metrics, without claiming completion."""
+    if not 0 <= completed_epochs <= planned_epochs or planned_epochs < 1:
+        raise ValueError("Invalid completed/planned epoch count")
+    values, invalid = {}, []
+    for key, value in (metrics or {}).items():
+        numeric = float(value)
+        values[key] = numeric if math.isfinite(numeric) else None
+        if not math.isfinite(numeric):
+            invalid.append(key)
+    return {"status": "running", "phase": "training", "updated_at": now(),
+            "completed_epochs": completed_epochs, "planned_epochs": planned_epochs,
+            "epoch_metrics": values, "non_finite_metric_keys": invalid,
+            "metric_protocol": "Ultralytics epoch validation; final COCO AP_small not yet measured"}
+
+
+def write_progress(run, record):
+    """Replace one local status file atomically so concurrent readers see valid JSON."""
+    import tempfile
+    run = Path(run)
+    with tempfile.NamedTemporaryFile(dir=run, prefix="progress-", suffix=".tmp", delete=False) as handle:
+        temporary = Path(handle.name)
+    try:
+        write_json(temporary, record)
+        temporary.replace(run / "progress.json")
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def load_config(path):
     with Path(path).open("rb") as handle:
         cfg = tomllib.load(handle)

@@ -31,7 +31,8 @@ def main(argv=None):
     record_dir = ROOT / "experiments" / experiment_id
     table = ROOT / "results/tables" / f"{experiment_id}.csv"
     figure = ROOT / "results/figures" / f"{experiment_id}-ap.png"
-    if record_dir.exists() or table.exists() or (args.figure and figure.exists()):
+    summary_path = record_dir / "summary.json"
+    if summary_path.exists() or table.exists() or (args.figure and figure.exists()):
         parser.error("Public output already exists; review updates manually rather than overwrite")
     # Whitelist provenance fields; commands, paths, settings and full environment stay private.
     source_files = ("scripts/run_yolo_experiment.py", "src/uav_small_target/yolo_experiment.py")
@@ -55,8 +56,10 @@ def main(argv=None):
     if (run / "loader-audit.json").is_file():
         report["reviewed_loader_audit"] = json.loads((run / "loader-audit.json").read_text())
         report["local_artifact_sha256"]["loader-audit.json"] = sha256(run / "loader-audit.json")
-    record_dir.mkdir()
-    write_json(record_dir / "summary.json", report)
+    record_dir.mkdir(exist_ok=True)
+    with summary_path.open("x", encoding="utf-8") as handle:
+        json.dump(report, handle, indent=2, ensure_ascii=False, allow_nan=False)
+        handle.write("\n")
     values = {"experiment_id": experiment_id, "kind": metrics["kind"], "epochs": metrics["trained_epochs"],
         "train_images": metrics["selected_images"]["train"], "val_images": metrics["selected_images"]["val"],
         "imgsz": cfg["train"]["imgsz"], "mAP50_fraction": metrics["coco"]["mAP50"],

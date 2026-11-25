@@ -1,0 +1,2 @@
+experiment_id,kind,epochs,train_images,val_images,imgsz,mAP50_fraction,mAP50_95_fraction,AP_small_fraction,precision_conf025_iou050,recall_conf025_iou050,FPS_cached_array,latency_mean_ms,latency_p95_ms
+exp-003-yolo11n-baseline-mps,baseline,50,6471,548,640,0.2754573903298793,0.15843815315497378,0.07577893215130056,0.6275875190258752,0.425526974380144,69.67288783485074,14.352785295341164,21.03777045849711
